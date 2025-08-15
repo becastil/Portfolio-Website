@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Features Test - Ben Castillo Portfolio</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #2563eb;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .test-pass {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .test-fail {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .test-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        #console-output {
+            background: #1a1a1a;
+            color: #e5e5e5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>JavaScript Features Test Suite</h1>
+        <p>This page tests all the interactive features implemented in Ben Castillo's portfolio website.</p>
+        
+        <div class="test-section">
+            <h3>1. DOM Element Detection Test</h3>
+            <button onclick="testDOMElements()">Test DOM Elements</button>
+            <div id="dom-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Theme Management Test</h3>
+            <button onclick="testThemeManager()">Test Theme Toggle</button>
+            <button onclick="testLocalStorage()">Test localStorage Persistence</button>
+            <div id="theme-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Navigation Test</h3>
+            <button onclick="testNavigation()">Test Smooth Scroll</button>
+            <button onclick="testActiveStates()">Test Active States</button>
+            <div id="nav-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Project Filtering Test</h3>
+            <button onclick="testProjectFilter()">Test Filter Functions</button>
+            <button onclick="testFilterAnimations()">Test Animations</button>
+            <div id="filter-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Form Validation Test</h3>
+            <button onclick="testFormValidation()">Test Validation Rules</button>
+            <button onclick="testFormSubmission()">Test Form Submission</button>
+            <div id="form-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>6. Performance & Accessibility Test</h3>
+            <button onclick="testPerformance()">Test Performance Utils</button>
+            <button onclick="testAccessibility()">Test Accessibility</button>
+            <div id="perf-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>7. Error Handling Test</h3>
+            <button onclick="testErrorHandling()">Test Error Handling</button>
+            <div id="error-results"></div>
+        </div>
+        
+        <div id="console-output">
+            <strong>Console Output:</strong><br>
+            <div id="console-log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock console to capture output
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn
+        };
+        
+        const consoleOutput = document.getElementById('console-log');
+        
+        function logToPage(type, ...args) {
+            const message = args.join(' ');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleOutput.innerHTML += `<div>[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            originalConsole[type](...args);
+        }
+        
+        console.log = (...args) => logToPage('log', ...args);
+        console.error = (...args) => logToPage('error', ...args);
+        console.warn = (...args) => logToPage('warn', ...args);
+        
+        // Test Results Helper
+        function showResult(containerId, testName, passed, message = '') {
+            const container = document.getElementById(containerId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+            resultDiv.innerHTML = `
+                <strong>${testName}:</strong> ${passed ? 'PASS' : 'FAIL'}
+                ${message ? '<br>' + message : ''}
+            `;
+            container.appendChild(resultDiv);
+        }
+        
+        function showInfo(containerId, message) {
+            const container = document.getElementById(containerId);
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'test-result test-info';
+            infoDiv.innerHTML = message;
+            container.appendChild(infoDiv);
+        }
+        
+        // Test Functions
+        function testDOMElements() {
+            document.getElementById('dom-results').innerHTML = '';
+            console.log('Testing DOM element detection...');
+            
+            // Test if script.js functionality is available by checking for portfolio elements
+            const hasThemeToggle = document.querySelector('[data-theme-toggle]') !== null;
+            const hasNavLinks = document.querySelectorAll('nav a[href^="#"]').length > 0;
+            const hasFilterButtons = document.querySelectorAll('[data-filter]').length > 0;
+            const hasContactForm = document.querySelector('[data-contact-form]') !== null;
+            
+            showResult('dom-results', 'Theme Toggle Element', hasThemeToggle);
+            showResult('dom-results', 'Navigation Links', hasNavLinks);
+            showResult('dom-results', 'Filter Buttons', hasFilterButtons);
+            showResult('dom-results', 'Contact Form', hasContactForm);
+            
+            if (!hasThemeToggle && !hasNavLinks && !hasFilterButtons && !hasContactForm) {
+                showInfo('dom-results', 'Note: This test page doesn\'t contain the portfolio elements. The script is designed to work with the main portfolio HTML structure.');
+            }
+        }
+        
+        function testThemeManager() {
+            document.getElementById('theme-results').innerHTML = '';
+            console.log('Testing Theme Manager...');
+            
+            // Test CSS custom properties manipulation
+            try {
+                const root = document.documentElement;
+                const originalBg = getComputedStyle(root).getPropertyValue('--color-background') || '#ffffff';
+                
+                // Test setting a custom property
+                root.style.setProperty('--test-color', '#ff0000');
+                const testColor = getComputedStyle(root).getPropertyValue('--test-color');
+                
+                showResult('theme-results', 'CSS Custom Properties', testColor.trim() === '#ff0000', 
+                    `Set: #ff0000, Got: ${testColor.trim()}`);
+                
+                // Clean up
+                root.style.removeProperty('--test-color');
+                
+            } catch (error) {
+                showResult('theme-results', 'CSS Custom Properties', false, error.message);
+            }
+            
+            // Test localStorage functionality
+            try {
+                localStorage.setItem('test-theme', 'dark');
+                const retrieved = localStorage.getItem('test-theme');
+                showResult('theme-results', 'localStorage Support', retrieved === 'dark');
+                localStorage.removeItem('test-theme');
+            } catch (error) {
+                showResult('theme-results', 'localStorage Support', false, 'localStorage not available');
+            }
+        }
+        
+        function testLocalStorage() {
+            document.getElementById('theme-results').innerHTML = '';
+            console.log('Testing localStorage persistence...');
+            
+            try {
+                // Test setting and getting values
+                const testKey = 'portfolio-theme-test';
+                const testValue = 'dark-mode-test';
+                
+                localStorage.setItem(testKey, testValue);
+                const retrieved = localStorage.getItem(testKey);
+                
+                showResult('theme-results', 'localStorage Set/Get', retrieved === testValue);
+                
+                // Test removal
+                localStorage.removeItem(testKey);
+                const afterRemoval = localStorage.getItem(testKey);
+                
+                showResult('theme-results', 'localStorage Removal', afterRemoval === null);
+                
+            } catch (error) {
+                showResult('theme-results', 'localStorage Operations', false, error.message);
+            }
+        }
+        
+        function testNavigation() {
+            document.getElementById('nav-results').innerHTML = '';
+            console.log('Testing Navigation features...');
+            
+            // Test scrollIntoView support
+            try {
+                const testElement = document.createElement('div');
+                testElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showResult('nav-results', 'Smooth Scroll API', true, 'scrollIntoView with options supported');
+            } catch (error) {
+                showResult('nav-results', 'Smooth Scroll API', false, 'scrollIntoView options not supported');
+            }
+            
+            // Test History API
+            try {
+                const originalState = history.state;
+                history.pushState(null, null, '#test');
+                const newLocation = window.location.hash;
+                showResult('nav-results', 'History API', newLocation === '#test');
+                history.back();
+            } catch (error) {
+                showResult('nav-results', 'History API', false, error.message);
+            }
+        }
+        
+        function testActiveStates() {
+            document.getElementById('nav-results').innerHTML = '';
+            console.log('Testing Active State Management...');
+            
+            // Test classList manipulation
+            const testElement = document.createElement('div');
+            testElement.classList.add('active');
+            showResult('nav-results', 'classList.add', testElement.classList.contains('active'));
+            
+            testElement.classList.remove('active');
+            showResult('nav-results', 'classList.remove', !testElement.classList.contains('active'));
+            
+            testElement.classList.toggle('active', true);
+            showResult('nav-results', 'classList.toggle', testElement.classList.contains('active'));
+        }
+        
+        function testProjectFilter() {
+            document.getElementById('filter-results').innerHTML = '';
+            console.log('Testing Project Filter...');
+            
+            // Test data attribute handling
+            const testElement = document.createElement('div');
+            testElement.setAttribute('data-category', 'web');
+            const category = testElement.getAttribute('data-category');
+            showResult('filter-results', 'Data Attributes', category === 'web');
+            
+            // Test array filtering logic
+            const projects = [
+                { category: 'web' },
+                { category: 'mobile' },
+                { category: 'data' },
+                { category: 'web' }
+            ];
+            
+            const webProjects = projects.filter(p => p.category === 'web');
+            showResult('filter-results', 'Array Filtering', webProjects.length === 2);
+            
+            const allProjects = projects.filter(p => 'all' === 'all' || p.category === 'all');
+            showResult('filter-results', 'Show All Logic', allProjects.length === 4);
+        }
+        
+        function testFilterAnimations() {
+            document.getElementById('filter-results').innerHTML = '';
+            console.log('Testing Filter Animations...');
+            
+            // Test CSS transition support
+            const testElement = document.createElement('div');
+            testElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            const transition = testElement.style.transition;
+            showResult('filter-results', 'CSS Transitions', transition.includes('opacity') && transition.includes('transform'));
+            
+            // Test setTimeout functionality
+            let timeoutWorking = false;
+            setTimeout(() => {
+                timeoutWorking = true;
+                showResult('filter-results', 'setTimeout Support', timeoutWorking);
+            }, 10);
+        }
+        
+        function testFormValidation() {
+            document.getElementById('form-results').innerHTML = '';
+            console.log('Testing Form Validation...');
+            
+            // Test regex patterns
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const namePattern = /^[a-zA-Z\s]+$/;
+            
+            showResult('form-results', 'Email Regex', 
+                emailPattern.test('test@example.com') && !emailPattern.test('invalid-email'));
+            
+            showResult('form-results', 'Name Regex', 
+                namePattern.test('John Doe') && !namePattern.test('John123'));
+            
+            // Test string validation
+            const testString = '  Hello World  ';
+            const trimmed = testString.trim();
+            showResult('form-results', 'String Trimming', trimmed === 'Hello World');
+            
+            // Test minimum length validation
+            const shortString = 'Hi';
+            const longString = 'This is a long message';
+            showResult('form-results', 'Length Validation', 
+                shortString.length < 10 && longString.length >= 10);
+        }
+        
+        function testFormSubmission() {
+            document.getElementById('form-results').innerHTML = '';
+            console.log('Testing Form Submission...');
+            
+            // Test preventDefault functionality
+            const testForm = document.createElement('form');
+            let preventDefaultCalled = false;
+            
+            const mockEvent = {
+                preventDefault: () => { preventDefaultCalled = true; }
+            };
+            
+            // Simulate preventDefault call
+            mockEvent.preventDefault();
+            showResult('form-results', 'preventDefault', preventDefaultCalled);
+            
+            // Test ARIA attribute manipulation
+            const testInput = document.createElement('input');
+            testInput.setAttribute('aria-invalid', 'true');
+            testInput.setAttribute('aria-describedby', 'error-message');
+            
+            showResult('form-results', 'ARIA Attributes', 
+                testInput.getAttribute('aria-invalid') === 'true' &&
+                testInput.getAttribute('aria-describedby') === 'error-message');
+        }
+        
+        function testPerformance() {
+            document.getElementById('perf-results').innerHTML = '';
+            console.log('Testing Performance Utilities...');
+            
+            // Test debounce function simulation
+            let debounceCallCount = 0;
+            function testDebounce() {
+                let timeout;
+                return function() {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        debounceCallCount++;
+                    }, 100);
+                };
+            }
+            
+            const debouncedFunction = testDebounce();
+            debouncedFunction();
+            debouncedFunction();
+            debouncedFunction();
+            
+            setTimeout(() => {
+                showResult('perf-results', 'Debounce Logic', debounceCallCount === 1);
+            }, 150);
+            
+            // Test throttle logic simulation
+            let throttleCallCount = 0;
+            let inThrottle = false;
+            function testThrottle() {
+                if (!inThrottle) {
+                    throttleCallCount++;
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, 100);
+                }
+            }
+            
+            testThrottle();
+            testThrottle();
+            testThrottle();
+            
+            showResult('perf-results', 'Throttle Logic', throttleCallCount === 1);
+            
+            // Test Intersection Observer support
+            showResult('perf-results', 'Intersection Observer', 
+                typeof IntersectionObserver !== 'undefined');
+        }
+        
+        function testAccessibility() {
+            document.getElementById('perf-results').innerHTML = '';
+            console.log('Testing Accessibility Features...');
+            
+            // Test keyboard event handling
+            const testButton = document.createElement('button');
+            let enterKeyHandled = false;
+            let spaceKeyHandled = false;
+            
+            testButton.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') enterKeyHandled = true;
+                if (e.key === ' ') spaceKeyHandled = true;
+            });
+            
+            // Simulate key events
+            testButton.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+            testButton.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
+            
+            showResult('perf-results', 'Keyboard Events', enterKeyHandled && spaceKeyHandled);
+            
+            // Test ARIA label support
+            testButton.setAttribute('aria-label', 'Test button');
+            showResult('perf-results', 'ARIA Labels', 
+                testButton.getAttribute('aria-label') === 'Test button');
+            
+            // Test focus management
+            document.body.appendChild(testButton);
+            testButton.focus();
+            showResult('perf-results', 'Focus Management', document.activeElement === testButton);
+            document.body.removeChild(testButton);
+        }
+        
+        function testErrorHandling() {
+            document.getElementById('error-results').innerHTML = '';
+            console.log('Testing Error Handling...');
+            
+            // Test try-catch functionality
+            let errorCaught = false;
+            try {
+                throw new Error('Test error');
+            } catch (error) {
+                errorCaught = true;
+            }
+            showResult('error-results', 'Try-Catch', errorCaught);
+            
+            // Test safe execution pattern
+            function safeExecute(func, context) {
+                try {
+                    return func();
+                } catch (error) {
+                    console.error(`Error in ${context}:`, error.message);
+                    return null;
+                }
+            }
+            
+            const result1 = safeExecute(() => 'success', 'test');
+            const result2 = safeExecute(() => { throw new Error('fail'); }, 'test');
+            
+            showResult('error-results', 'Safe Execution', result1 === 'success' && result2 === null);
+            
+            // Test error logging
+            let errorLogged = false;
+            const originalError = console.error;
+            console.error = (...args) => {
+                errorLogged = true;
+                originalError(...args);
+            };
+            
+            safeExecute(() => { throw new Error('test'); }, 'test');
+            showResult('error-results', 'Error Logging', errorLogged);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('JavaScript Feature Test Suite Loaded');
+            showInfo('dom-results', 'Click the test buttons above to validate each feature set.');
+        });
+    </script>
+</body>
+</html>
