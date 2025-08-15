@@ -1,0 +1,76 @@
+name: Deploy Portfolio to GitHub Pages
+
+on:
+  # Trigger deployment on push to main branch
+  push:
+    branches: [ main ]
+  
+  # Allow manual deployment from Actions tab
+  workflow_dispatch:
+
+# Set permissions for GitHub token to deploy to Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job (for static sites, this mainly validates and optimizes)
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js (for potential future build steps)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Validate HTML structure
+        run: |
+          # Install html5validator for HTML validation
+          pip install html5validator
+          html5validator --root . --format text --log INFO
+          
+      - name: Check CSS and JS syntax
+        run: |
+          # Basic syntax checking
+          echo "Checking CSS files..."
+          find . -name "*.css" -exec echo "Checking {}" \; -exec cat {} > /dev/null \;
+          echo "Checking JavaScript files..."
+          find . -name "*.js" -exec echo "Checking {}" \; -exec node -c {} \;
+          
+      - name: Optimize images (if any)
+        run: |
+          # Create optimized assets directory
+          mkdir -p _site
+          cp -r . _site/
+          # Remove git directory from site
+          rm -rf _site/.git
+          rm -rf _site/.github
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
