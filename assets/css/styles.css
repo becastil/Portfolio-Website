@@ -1,123 +1,777 @@
-/* Reset and base styles */
+/*
+==================================================
+MINIMALIST PORTFOLIO CSS SYSTEM
+Inspired by williamlin.io - Clean, accessible, performant
+==================================================
+*/
+
+/* 
+CSS Custom Properties (Design Tokens)
+These variables create a consistent design system that's easy to maintain
+*/
+:root {
+  /* Color System - Light Theme */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-background: #ffffff;
+  --color-background-subtle: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f3f4f6;
+  
+  /* Typography Scale - Modular scale based on 1.25 ratio */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+  
+  /* Font families - System fonts for performance */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line heights - Optimized for readability */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Spacing Scale - Based on 4px base unit */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  
+  /* Container and breakpoint system */
+  --container-max-width: 1200px;
+  --container-padding: var(--space-4);
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  
+  /* Border radius scale */
+  --radius-sm: 0.125rem;   /* 2px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+  
+  /* Shadow system */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Transition timing */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  --color-background: #111827;
+  --color-background-subtle: #1f2937;
+  --color-border: #374151;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-surface: #1f2937;
+  --color-surface-hover: #374151;
+}
+
+/*
+==================================================
+RESET & BASE STYLES
+Provides consistent foundation across browsers
+==================================================
+*/
+
+/* Modern CSS reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Prevents horizontal scroll on smaller devices */
+  overflow-x: hidden;
+  /* Smooth scrolling for anchor links */
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    line-height: 1.6;
-    color: #333;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  /* Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent font size inflation on mobile */
+  text-size-adjust: 100%;
 }
 
-/* Header and Navigation */
-header {
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* Remove default list styles */
+ul,
+ol {
+  list-style: none;
 }
 
-nav {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Remove default link styles */
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-nav h1 {
-    font-size: 1.5rem;
-    color: #2c3e50;
+/* Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-nav ul {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
+/* Form element improvements */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
 }
 
-nav a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s ease;
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-nav a:hover {
-    color: #3498db;
+/*
+==================================================
+TYPOGRAPHY SYSTEM
+Establishes clear hierarchy and readability
+==================================================
+*/
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
 }
 
-/* Main content */
-main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+h1 { font-size: var(--font-size-5xl); }
+h2 { font-size: var(--font-size-4xl); }
+h3 { font-size: var(--font-size-3xl); }
+h4 { font-size: var(--font-size-2xl); }
+h5 { font-size: var(--font-size-xl); }
+h6 { font-size: var(--font-size-lg); }
+
+p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+  max-width: 65ch; /* Optimal reading length */
 }
 
-section {
-    padding: 4rem 0;
-}
-
-h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #2c3e50;
-}
-
-#hero {
-    text-align: center;
-    padding: 6rem 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    margin: 0 -2rem;
-}
-
-#hero h2 {
-    font-size: 3rem;
-    color: white;
-}
-
-#hero p {
-    font-size: 1.2rem;
-    margin-top: 1rem;
-}
-
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-/* Footer */
-footer {
-    background: #2c3e50;
-    color: white;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 4rem;
-}
-
-/* Responsive design */
+/* Responsive typography - fluid scaling */
 @media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    nav ul {
-        gap: 1rem;
-    }
-    
-    #hero h2 {
-        font-size: 2rem;
-    }
-    
-    h2 {
-        font-size: 2rem;
-    }
+  h1 { font-size: var(--font-size-4xl); }
+  h2 { font-size: var(--font-size-3xl); }
+  h3 { font-size: var(--font-size-2xl); }
+}
+
+/*
+==================================================
+LAYOUT UTILITIES
+Reusable layout patterns
+==================================================
+*/
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.section {
+  padding: var(--space-20) 0;
+}
+
+.section--large {
+  padding: var(--space-24) 0;
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/*
+==================================================
+NAVIGATION
+Sticky header with clean minimal design
+==================================================
+*/
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  /* Backdrop blur for modern browsers */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) 0;
+  min-height: 4rem;
+}
+
+.nav__brand {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.nav__links {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.nav__link {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+  position: relative;
+  padding: var(--space-2) 0;
+}
+
+.nav__link:hover,
+.nav__link:focus {
+  color: var(--color-accent);
+  outline: none;
+}
+
+/* Subtle underline effect on hover */
+.nav__link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-accent);
+  transition: width var(--transition-normal);
+}
+
+.nav__link:hover::after,
+.nav__link:focus::after {
+  width: 100%;
+}
+
+/*
+==================================================
+HERO SECTION
+Impactful introduction without overwhelming design
+==================================================
+*/
+
+.hero {
+  padding: var(--space-24) 0;
+  text-align: center;
+  background-color: var(--color-background-subtle);
+}
+
+.hero__title {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  line-height: var(--line-height-tight);
+}
+
+.hero__subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-accent);
+  color: white;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero__cta:hover,
+.hero__cta:focus {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  outline: none;
+}
+
+/*
+==================================================
+PROJECT GRID
+Responsive grid with clean card design
+==================================================
+*/
+
+.projects {
+  padding: var(--space-20) 0;
+}
+
+.projects__grid {
+  display: grid;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+  /* Mobile-first: 1 column */
+  grid-template-columns: 1fr;
+}
+
+.project-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+}
+
+.project-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.project-card__description {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--space-4);
+}
+
+.project-card__tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.tech-tag {
+  font-size: var(--font-size-sm);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-background-subtle);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.project-card__links {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.project-link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+  transition: color var(--transition-fast);
+}
+
+.project-link:hover,
+.project-link:focus {
+  color: var(--color-accent-hover);
+  outline: none;
+}
+
+/*
+==================================================
+ABOUT SECTION
+Readable content with optimal line length
+==================================================
+*/
+
+.about {
+  padding: var(--space-20) 0;
+  background-color: var(--color-background-subtle);
+}
+
+.about__content {
+  max-width: 70ch;
+  margin: 0 auto;
+}
+
+.about__text {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+/*
+==================================================
+CONTACT FORM
+Modern form styling with excellent UX
+==================================================
+*/
+
+.contact {
+  padding: var(--space-20) 0;
+}
+
+.contact__form {
+  max-width: 600px;
+  margin: var(--space-12) auto 0;
+}
+
+.form-group {
+  margin-bottom: var(--space-6);
+}
+
+.form-label {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-base);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-button {
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-accent);
+  color: white;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.form-button:hover,
+.form-button:focus {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  outline: none;
+}
+
+.form-button:active {
+  transform: translateY(0);
+}
+
+/*
+==================================================
+FOOTER
+Minimal footer with essential information
+==================================================
+*/
+
+.footer {
+  padding: var(--space-16) 0;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-background-subtle);
+}
+
+.footer__content {
+  text-align: center;
+}
+
+.footer__text {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.footer__links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.footer__link {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+
+.footer__link:hover,
+.footer__link:focus {
+  color: var(--color-accent);
+  outline: none;
+}
+
+/*
+==================================================
+RESPONSIVE DESIGN
+Mobile-first approach with logical breakpoints
+==================================================
+*/
+
+/* Tablet: 768px and up */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-8);
+  }
+  
+  .nav__links {
+    gap: var(--space-10);
+  }
+  
+  /* 2-column grid for tablets */
+  .projects__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero__title {
+    font-size: var(--font-size-5xl);
+  }
+}
+
+/* Desktop: 1024px and up */
+@media (min-width: 1024px) {
+  /* 3-column grid for desktop */
+  .projects__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .section {
+    padding: var(--space-24) 0;
+  }
+  
+  .hero {
+    padding: var(--space-24) 0 var(--space-20);
+  }
+}
+
+/* Large screens: 1280px and up */
+@media (min-width: 1280px) {
+  .container {
+    padding: 0 var(--space-12);
+  }
+}
+
+/* Mobile navigation adjustments */
+@media (max-width: 767px) {
+  .nav {
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+  }
+  
+  .nav__links {
+    gap: var(--space-6);
+  }
+  
+  .hero {
+    padding: var(--space-16) 0;
+  }
+  
+  .hero__title {
+    font-size: var(--font-size-4xl);
+  }
+  
+  .hero__subtitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .footer__links {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+/*
+==================================================
+ACCESSIBILITY IMPROVEMENTS
+Focus states and screen reader support
+==================================================
+*/
+
+/* Enhanced focus visibility */
+.nav__link:focus-visible,
+.hero__cta:focus-visible,
+.project-link:focus-visible,
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.form-button:focus-visible,
+.footer__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text-secondary: var(--color-text-primary);
+  }
+  
+  [data-theme="dark"] {
+    --color-border: #ffffff;
+  }
+}
+
+/*
+==================================================
+UTILITY CLASSES
+Common utilities for quick styling
+==================================================
+*/
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.mb-4 {
+  margin-bottom: var(--space-4);
+}
+
+.mb-8 {
+  margin-bottom: var(--space-8);
+}
+
+.mt-8 {
+  margin-top: var(--space-8);
+}
+
+.mt-12 {
+  margin-top: var(--space-12);
 }

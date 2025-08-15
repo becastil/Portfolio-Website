@@ -1,51 +1,651 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Essential meta tags for modern web standards -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - becastil</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- SEO and social sharing meta tags -->
+    <title>Ben Castillo - Full-Stack Developer</title>
+    <meta name="description" content="Ben Castillo is a full-stack developer passionate about creating elegant solutions to complex problems. Specializing in modern web technologies and cloud architecture.">
+    <meta name="author" content="Ben Castillo">
+    
+    <!-- Open Graph meta tags for social sharing -->
+    <meta property="og:title" content="Ben Castillo - Full-Stack Developer">
+    <meta property="og:description" content="Full-stack developer specializing in modern web technologies and cloud architecture.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bencastillo.dev">
+    
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Ben Castillo - Full-Stack Developer">
+    <meta name="twitter:description" content="Full-stack developer specializing in modern web technologies and cloud architecture.">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Minimal, clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Minimal CSS following williamlin.io aesthetic */
+        :root {
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-background: #ffffff;
+            --color-border: #e5e5e5;
+            --color-accent: #2563eb;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --max-width: 1024px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-background);
+        }
+        
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Skip link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--color-accent);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        /* Header and navigation */
+        header {
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            background: var(--color-background);
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--color-text);
+            text-decoration: none;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.2s ease;
+        }
+        
+        nav a:hover,
+        nav a:focus {
+            color: var(--color-accent);
+        }
+        
+        nav a:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+        
+        /* Main content sections */
+        main {
+            min-height: calc(100vh - 140px);
+        }
+        
+        section {
+            padding: 4rem 0;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 6rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .hero .tagline {
+            font-size: 1.25rem;
+            color: var(--color-text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        /* Projects grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .project-card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .project-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .project-card p {
+            color: var(--color-text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tag {
+            background: #f3f4f6;
+            color: var(--color-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+        
+        /* Contact form */
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-primary:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Enhanced form accessibility */
+        .form-group input:focus-visible,
+        .form-group textarea:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Error state styling - separate from focus */
+        .form-group input[aria-invalid="true"],
+        .form-group textarea[aria-invalid="true"] {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .form-group input[aria-invalid="true"]:focus-visible,
+        .form-group textarea[aria-invalid="true"]:focus-visible {
+            outline: 2px solid #ef4444;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        /* Error message styling */
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .error-message::before {
+            content: "⚠️";
+            font-size: 0.8rem;
+        }
+        
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .social-links a:hover {
+            color: var(--color-accent);
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid var(--color-border);
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+            min-width: 44px; /* WCAG touch target minimum */
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle-btn:hover {
+            background-color: var(--color-border);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle-btn:focus {
+            outline: none;
+        }
+        
+        .theme-toggle-btn:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Project Filter Buttons */
+        .filter-btn {
+            margin: 0 0.5rem 0.5rem 0;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--color-accent);
+            background: var(--color-background);
+            color: var(--color-accent);
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px; /* WCAG touch target */
+            min-width: 44px;
+        }
+        
+        .filter-btn[aria-pressed="true"] {
+            background: var(--color-accent);
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background: var(--color-accent);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        }
+        
+        .filter-btn:focus {
+            outline: none;
+        }
+        
+        .filter-btn:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        
+        .filter-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--color-border);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--color-text-light);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero .tagline {
+                font-size: 1rem;
+            }
+            
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <h1>becastil</h1>
-            <ul>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+    <!-- Skip link for screen reader accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Site header with navigation - semantic landmark for site banner -->
+    <header role="banner">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo/brand as heading for site identity -->
+                <a href="#" class="logo" aria-label="Ben Castillo - Home">BC</a>
+                
+                <!-- Primary site navigation - semantic landmark -->
+                <nav role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+                
+                <!-- Dark mode toggle button with data attribute for JS -->
+                <button 
+                    type="button" 
+                    data-theme-toggle 
+                    aria-label="Toggle dark mode"
+                    aria-pressed="false"
+                    class="theme-toggle-btn">
+                    🌙
+                </button>
+            </div>
+        </div>
     </header>
-
-    <main>
-        <section id="hero">
-            <h2>Welcome to My Portfolio</h2>
-            <p>Web Developer & Designer</p>
-        </section>
-
-        <section id="about">
-            <h2>About Me</h2>
-            <p>Your about section content here...</p>
-        </section>
-
-        <section id="projects">
-            <h2>My Projects</h2>
-            <div class="project-grid">
-                <!-- Project cards will go here -->
+    
+    <!-- Main content area - primary landmark for page content -->
+    <main id="main-content" role="main">
+        <!-- Hero section - introduction and main value proposition -->
+        <section class="hero" aria-labelledby="hero-heading">
+            <div class="container">
+                <!-- Main page heading - most important heading on page -->
+                <h1 id="hero-heading">Ben Castillo</h1>
+                <p class="tagline">Full-stack developer passionate about creating elegant solutions to complex problems. Specializing in modern web technologies and cloud architecture.</p>
             </div>
         </section>
-
-        <section id="contact">
-            <h2>Contact</h2>
-            <p>Get in touch with me...</p>
+        
+        <!-- About section - biographical information -->
+        <section id="about" class="about" aria-labelledby="about-heading">
+            <div class="container">
+                <h2 id="about-heading" class="section-title">About</h2>
+                <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                    <p style="font-size: 1.125rem; line-height: 1.7; color: var(--color-text-light);">
+                        I'm a full-stack developer with a passion for building scalable web applications and exploring emerging technologies. 
+                        My journey spans from crafting pixel-perfect user interfaces to architecting robust backend systems. 
+                        I believe in writing clean, maintainable code and creating solutions that make a real impact.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Projects section - portfolio showcase -->
+        <section id="projects" class="projects" aria-labelledby="projects-heading">
+            <div class="container">
+                <h2 id="projects-heading" class="section-title">Projects</h2>
+                
+                <!-- Project filter buttons with data attributes for JavaScript interaction -->
+                <div style="text-align: center; margin-bottom: 2rem;" role="group" aria-labelledby="filter-heading">
+                    <h3 id="filter-heading" class="sr-only">Filter projects by category</h3>
+                    <button type="button" data-filter="all" class="filter-btn" aria-pressed="true" aria-controls="projects-grid" aria-describedby="filter-status">All Projects</button>
+                    <button type="button" data-filter="web" class="filter-btn" aria-pressed="false" aria-controls="projects-grid">Web Applications</button>
+                    <button type="button" data-filter="mobile" class="filter-btn" aria-pressed="false" aria-controls="projects-grid">Mobile Apps</button>
+                    <button type="button" data-filter="data" class="filter-btn" aria-pressed="false" aria-controls="projects-grid">Data Projects</button>
+                </div>
+                
+                <!-- Live region for filter announcements -->
+                <div id="filter-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+                
+                <!-- Projects grid with semantic article elements for each project -->
+                <div class="projects-grid" id="projects-grid">
+                    <!-- Each project card is an article - standalone content -->
+                    <article class="project-card" data-category="web" aria-labelledby="project-1-title">
+                        <h3 id="project-1-title">E-Commerce Platform</h3>
+                        <p>Full-stack web application built with React and Node.js, featuring user authentication, payment processing, and admin dashboard.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">MongoDB</span>
+                            <span class="tag">Stripe</span>
+                        </div>
+                    </article>
+                    
+                    <article class="project-card" data-category="mobile" aria-labelledby="project-2-title">
+                        <h3 id="project-2-title">Task Management App</h3>
+                        <p>React Native mobile application with Firebase backend for real-time collaboration and offline functionality.</p>
+                        <div class="project-tags">
+                            <span class="tag">React Native</span>
+                            <span class="tag">Firebase</span>
+                            <span class="tag">Redux</span>
+                            <span class="tag">TypeScript</span>
+                        </div>
+                    </article>
+                    
+                    <article class="project-card" data-category="data" aria-labelledby="project-3-title">
+                        <h3 id="project-3-title">Data Visualization Dashboard</h3>
+                        <p>Interactive dashboard using D3.js and Python Flask to visualize complex datasets with real-time updates.</p>
+                        <div class="project-tags">
+                            <span class="tag">D3.js</span>
+                            <span class="tag">Python</span>
+                            <span class="tag">Flask</span>
+                            <span class="tag">PostgreSQL</span>
+                        </div>
+                    </article>
+                    
+                    <article class="project-card" data-category="data" aria-labelledby="project-4-title">
+                        <h3 id="project-4-title">Machine Learning Model</h3>
+                        <p>TensorFlow-based image classification model with 95% accuracy, deployed using Docker and cloud infrastructure.</p>
+                        <div class="project-tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">TensorFlow</span>
+                            <span class="tag">Docker</span>
+                            <span class="tag">AWS</span>
+                        </div>
+                    </article>
+                    
+                    <article class="project-card" data-category="web" aria-labelledby="project-5-title">
+                        <h3 id="project-5-title">API Development</h3>
+                        <p>RESTful API built with Express.js and MongoDB, featuring authentication, rate limiting, and comprehensive documentation.</p>
+                        <div class="project-tags">
+                            <span class="tag">Express.js</span>
+                            <span class="tag">MongoDB</span>
+                            <span class="tag">JWT</span>
+                            <span class="tag">Swagger</span>
+                        </div>
+                    </article>
+                    
+                    <article class="project-card" data-category="web" aria-labelledby="project-6-title">
+                        <h3 id="project-6-title">Open Source Contribution</h3>
+                        <p>Major feature contribution to a popular JavaScript library, improving performance by 40% and adding TypeScript support.</p>
+                        <div class="project-tags">
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">TypeScript</span>
+                            <span class="tag">Open Source</span>
+                            <span class="tag">Performance</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact section - contact form and social links -->
+        <section id="contact" class="contact" aria-labelledby="contact-heading">
+            <div class="container">
+                <h2 id="contact-heading" class="section-title">Get In Touch</h2>
+                
+                <div class="contact-content">
+                    <!-- Contact form with proper labels and accessibility -->
+                    <form class="contact-form" data-contact-form aria-label="Contact form">
+                        <div class="form-group">
+                            <label for="name">Name <span aria-label="required">*</span></label>
+                            <input type="text" id="name" name="name" required aria-describedby="name-error">
+                            <span id="name-error" role="alert" class="error-message" style="display: none;"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email <span aria-label="required">*</span></label>
+                            <input type="email" id="email" name="email" required aria-describedby="email-error">
+                            <span id="email-error" role="alert" class="error-message" style="display: none;"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message <span aria-label="required">*</span></label>
+                            <textarea id="message" name="message" required aria-describedby="message-error" placeholder="Tell me about your project or just say hello!"></textarea>
+                            <span id="message-error" role="alert" class="error-message" style="display: none;"></span>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Send Message</button>
+                    </form>
+                    
+                    <!-- Social links and contact information -->
+                    <div>
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem;" id="connect-heading">Connect With Me</h3>
+                        <div class="social-links">
+                            <a href="mailto:ben@bencastillo.dev" aria-label="Email Ben Castillo">
+                                📧 ben@bencastillo.dev
+                            </a>
+                            <a href="https://linkedin.com/in/bencastillo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile (opens in new tab)">
+                                💼 LinkedIn
+                            </a>
+                            <a href="https://github.com/bencastillo" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile (opens in new tab)">
+                                🐙 GitHub
+                            </a>
+                            <a href="https://twitter.com/bencastillo_dev" target="_blank" rel="noopener noreferrer" aria-label="Twitter profile (opens in new tab)">
+                                🐦 Twitter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
-
-    <footer>
-        <p>&copy; 2025 becastil. All rights reserved.</p>
+    
+    <!-- Site footer - secondary landmark for site information -->
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2025 Ben Castillo. Built with semantic HTML5 and modern web standards.</p>
+        </div>
     </footer>
-
+    
+    <!-- Include main JavaScript file for interactive features -->
     <script src="assets/js/script.js"></script>
 </body>
 </html>
