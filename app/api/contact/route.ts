@@ -6,7 +6,7 @@ import { JSDOM } from 'jsdom'
 
 // Initialize DOMPurify for server-side usage
 const window = new JSDOM('').window
-const purify = DOMPurify(window as any)
+const purify = DOMPurify(window as unknown as Window & typeof globalThis)
 
 // Initialize Resend with API key from environment variables
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
@@ -231,7 +231,7 @@ async function sendContactEmail(data: {
 function logSecurityEvent(
   event: string, 
   ip: string, 
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 ): void {
   const logEntry = {
     timestamp: new Date().toISOString(),
@@ -333,7 +333,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Validation failed',
-          details: validationResult.error.issues.map((err: any) => ({
+          details: validationResult.error.issues.map((err: z.ZodIssue) => ({
             field: err.path.join('.'),
             message: err.message,
           })),

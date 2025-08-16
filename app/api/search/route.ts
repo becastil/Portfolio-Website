@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Fuse from 'fuse.js'
 import { getBlogPostPreviews } from '@/lib/blog'
-import { BlogPostPreview } from '@/types'
 
 // Fuse.js configuration for blog search  
 const fuseOptions = {

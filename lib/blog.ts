@@ -147,7 +147,7 @@ export async function getBlogPostPreviews(): Promise<BlogPostPreview[]> {
   }
 
   const posts = await getAllBlogPosts()
-  const previews = posts.map(({ content, tableOfContents, ...preview }) => preview)
+  const previews = posts.map(({ content: _content, tableOfContents: _tableOfContents, ...preview }) => preview)
   
   previewsCache = previews
   return previews
@@ -357,7 +357,7 @@ function calculateSimilarityScore(post1: BlogPostPreview, post2: BlogPostPreview
 /**
  * Validate and normalize frontmatter data
  */
-function validateFrontmatter(data: any): BlogPostFrontmatter {
+function validateFrontmatter(data: Record<string, unknown>): BlogPostFrontmatter {
   const required = ['title', 'excerpt', 'publishedAt', 'author', 'categories', 'tags', 'mainImage']
   
   for (const field of required) {

@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       modifiedTime: post.updatedAt || post.publishedAt,
       authors: post.author.name,
       section: post.categories[0] || 'Technology',
-      tags: post.tags,
+      tags: post.tags.join(', '),
     }
   )
 

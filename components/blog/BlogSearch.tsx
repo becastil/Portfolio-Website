@@ -152,7 +152,7 @@ export default function BlogSearch({ isOpen, onClose }: BlogSearchProps) {
               {!error && query && !isLoading && results.length === 0 && (
                 <FadeIn className="p-6 text-center">
                   <div className="text-gray-500 dark:text-gray-400 mb-2">
-                    No articles found for "{query}"
+                    No articles found for &quot;{query}&quot;
                   </div>
                   <p className="text-sm text-gray-400 dark:text-gray-500">
                     Try different keywords or check your spelling
@@ -163,7 +163,7 @@ export default function BlogSearch({ isOpen, onClose }: BlogSearchProps) {
               {!error && query && totalResults > 0 && (
                 <div className="p-3 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {totalResults} result{totalResults === 1 ? '' : 's'} for "{query}"
+                    {totalResults} result{totalResults === 1 ? '' : 's'} for &quot;{query}&quot;
                   </p>
                 </div>
               )}

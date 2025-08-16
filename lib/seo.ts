@@ -255,7 +255,7 @@ export function generateTwitterMetadata(
 /**
  * Helper to inject structured data into page head
  */
-export function createStructuredDataScript(data: any) {
+export function createStructuredDataScript(data: unknown) {
   return {
     __html: JSON.stringify(data)
   }
