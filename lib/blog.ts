@@ -371,26 +371,26 @@ function validateFrontmatter(data: Record<string, unknown>): BlogPostFrontmatter
   const tags = Array.isArray(data.tags) ? data.tags : [data.tags]
   
   return {
-    title: data.title,
-    excerpt: data.excerpt,
-    publishedAt: data.publishedAt,
-    updatedAt: data.updatedAt,
+    title: data.title as string,
+    excerpt: data.excerpt as string,
+    publishedAt: data.publishedAt as string,
+    updatedAt: data.updatedAt as string | undefined,
     featured: Boolean(data.featured),
     author: {
-      name: data.author.name || 'Unknown Author',
-      bio: data.author.bio || '',
-      avatar: data.author.avatar || '/api/placeholder/100/100'
+      name: (data.author as any)?.name || 'Unknown Author',
+      bio: (data.author as any)?.bio || '',
+      avatar: (data.author as any)?.avatar || '/api/placeholder/100/100'
     },
     categories,
     tags,
     mainImage: {
-      url: data.mainImage.url || '/api/placeholder/1200/600',
-      alt: data.mainImage.alt || data.title
+      url: (data.mainImage as any)?.url || '/api/placeholder/1200/600',
+      alt: (data.mainImage as any)?.alt || (data.title as string)
     },
     series: data.series ? {
-      title: data.series.title,
-      order: Number(data.series.order),
-      total: Number(data.series.total)
+      title: (data.series as any)?.title || '',
+      order: Number((data.series as any)?.order || 1),
+      total: Number((data.series as any)?.total || 1)
     } : undefined
   }
 }
