@@ -10,22 +10,10 @@ import {
   ScaleIn,
   FadeIn 
 } from '@/components/animations'
-
-interface RelatedPost {
-  _id: string
-  title: string
-  slug: { current: string }
-  excerpt: string
-  mainImage?: {
-    asset: { url: string }
-    alt: string
-  }
-  publishedAt?: string
-  readingTime?: number
-}
+import { BlogPostPreview } from '@/types'
 
 interface RelatedPostsProps {
-  posts: RelatedPost[]
+  posts: BlogPostPreview[]
 }
 
 export default function RelatedPosts({ posts }: RelatedPostsProps) {
@@ -58,7 +46,7 @@ export default function RelatedPosts({ posts }: RelatedPostsProps) {
   )
 }
 
-function RelatedPostCard({ post }: { post: RelatedPost }) {
+function RelatedPostCard({ post }: { post: BlogPostPreview }) {
   const formattedDate = post.publishedAt 
     ? new Date(post.publishedAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -82,7 +70,7 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
               transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <Image
-                src={post.mainImage.asset.url}
+                src={post.mainImage.url}
                 alt={post.mainImage.alt}
                 fill
                 className="object-cover"
@@ -98,7 +86,7 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
               whileHover={{ opacity: 1, y: 0 }}
               className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
             >
-              <Link href={`/blog/${post.slug.current}`}>
+              <Link href={`/blog/${post.slug}`}>
                 <motion.div
                   className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-lg font-medium hover:bg-white transition-colors"
                   whileHover={{ scale: 1.05 }}
@@ -140,12 +128,12 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
                 {post.readingTime && (
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    {post.readingTime}m
+                    {post.readingTime.minutes}m
                   </div>
                 )}
               </div>
 
-              <Link href={`/blog/${post.slug.current}`}>
+              <Link href={`/blog/${post.slug}`}>
                 <motion.div
                   className="flex items-center gap-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium group"
                   whileHover={{ x: 3 }}
