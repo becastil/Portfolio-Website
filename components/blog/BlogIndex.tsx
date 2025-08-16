@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, ArrowRight } from 'lucide-react'
 import { 
@@ -104,7 +104,7 @@ export default function BlogIndex() {
 
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
-    let filtered = mockBlogPosts.filter(post => {
+    const filtered = mockBlogPosts.filter(post => {
       const matchesSearch = post.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                            post.excerpt.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                            post.tags.some(tag => tag.toLowerCase().includes(debouncedSearch.toLowerCase()))

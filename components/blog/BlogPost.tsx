@@ -9,8 +9,6 @@ import {
   Clock, 
   Tag, 
   ArrowLeft, 
-  Share2, 
-  Link as LinkIcon,
   ChevronUp,
   Star,
   User,
@@ -20,9 +18,7 @@ import {
   TextReveal, 
   FadeIn, 
   SlideIn, 
-  ParallaxWrapper,
-  AnimatedSection,
-  StaggerContainer 
+  AnimatedSection
 } from '@/components/animations'
 import ReadingProgress from './ReadingProgress'
 import TableOfContents from './TableOfContents'
@@ -51,8 +47,16 @@ interface BlogPostProps {
     updatedAt?: string
     readingTime: number
     featured?: boolean
-    content: any[]
-    relatedArticles?: any[]
+    content: Array<{
+      _type: string
+      [key: string]: unknown
+    }>
+    relatedArticles?: Array<{
+      _id: string
+      title: string
+      slug: { current: string }
+      excerpt: string
+    }>
     series?: {
       title: string
       order: number

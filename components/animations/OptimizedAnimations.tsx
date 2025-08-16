@@ -62,7 +62,6 @@ export function OptimizedMotion({
   }, [
     shouldReduceMotion,
     respectReducedMotion,
-    isLowPerformance,
     getOptimizedAnimationSettings,
     enableGPUAcceleration,
     initial,
