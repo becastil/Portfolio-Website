@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, ArrowRight } from 'lucide-react'
 import { 
@@ -12,105 +12,35 @@ import {
 } from '@/components/animations'
 import BlogCard from './BlogCard'
 import BlogFilters from './BlogFilters'
+import BlogSearch from './BlogSearch'
 import { useDebounce } from '@/hooks/useDebounce'
+import { BlogPostPreview } from '@/types'
 
-// Mock blog data - replace with actual Sanity queries
-const mockBlogPosts = [
-  {
-    _id: '1',
-    title: 'Building Interactive Web Experiences with Framer Motion',
-    slug: { current: 'framer-motion-interactive-web' },
-    excerpt: 'Learn how to create smooth animations and transitions that enhance user experience without overwhelming your audience.',
-    mainImage: {
-      asset: { url: '/api/placeholder/600/400' },
-      alt: 'Framer Motion animation examples'
-    },
-    author: { name: 'Ben Castillo', slug: { current: 'ben-castillo' } },
-    categories: [{ title: 'Frontend', slug: { current: 'frontend' } }],
-    tags: ['React', 'Animation', 'UX'],
-    publishedAt: '2024-01-15T10:00:00Z',
-    readingTime: 8,
-    featured: true,
-  },
-  {
-    _id: '2',
-    title: 'The Art of Progressive Enhancement in Modern Web Development',
-    slug: { current: 'progressive-enhancement-modern-web' },
-    excerpt: 'Discover how to build websites that work for everyone, regardless of their device or connection speed.',
-    mainImage: {
-      asset: { url: '/api/placeholder/600/400' },
-      alt: 'Progressive enhancement diagram'
-    },
-    author: { name: 'Ben Castillo', slug: { current: 'ben-castillo' } },
-    categories: [{ title: 'Web Development', slug: { current: 'web-dev' } }],
-    tags: ['Performance', 'Accessibility', 'HTML'],
-    publishedAt: '2024-01-10T14:30:00Z',
-    readingTime: 12,
-    featured: false,
-  },
-  {
-    _id: '3',
-    title: 'TypeScript Best Practices for Scalable Applications',
-    slug: { current: 'typescript-best-practices-scalable' },
-    excerpt: 'Essential TypeScript patterns and practices for building maintainable and type-safe applications.',
-    mainImage: {
-      asset: { url: '/api/placeholder/600/400' },
-      alt: 'TypeScript code examples'
-    },
-    author: { name: 'Ben Castillo', slug: { current: 'ben-castillo' } },
-    categories: [{ title: 'Backend', slug: { current: 'backend' } }],
-    tags: ['TypeScript', 'Architecture', 'Best Practices'],
-    publishedAt: '2024-01-05T09:15:00Z',
-    readingTime: 15,
-    featured: false,
-  },
-  {
-    _id: '4',
-    title: 'CSS Grid vs Flexbox: When to Use Which',
-    slug: { current: 'css-grid-vs-flexbox-guide' },
-    excerpt: 'A comprehensive guide to choosing between CSS Grid and Flexbox for your layout needs.',
-    mainImage: {
-      asset: { url: '/api/placeholder/600/400' },
-      alt: 'CSS Grid and Flexbox comparison'
-    },
-    author: { name: 'Ben Castillo', slug: { current: 'ben-castillo' } },
-    categories: [{ title: 'CSS', slug: { current: 'css' } }],
-    tags: ['CSS', 'Layout', 'Grid', 'Flexbox'],
-    publishedAt: '2023-12-28T16:45:00Z',
-    readingTime: 10,
-    featured: false,
-  },
-]
+interface BlogIndexProps {
+  initialPosts: BlogPostPreview[]
+  categories: string[]
+  tags: string[]
+}
 
-export default function BlogIndex() {
+export default function BlogIndex({ initialPosts, categories, tags }: BlogIndexProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedTag, setSelectedTag] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
   const [showFilters, setShowFilters] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
 
   const debouncedSearch = useDebounce(searchQuery, 300)
 
-  // Extract unique categories and tags
-  const categories = useMemo(() => {
-    const cats = mockBlogPosts.flatMap(post => post.categories.map(cat => cat.title))
-    return [...new Set(cats)]
-  }, [])
-
-  const tags = useMemo(() => {
-    const allTags = mockBlogPosts.flatMap(post => post.tags)
-    return [...new Set(allTags)]
-  }, [])
-
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
-    const filtered = mockBlogPosts.filter(post => {
+    const filtered = initialPosts.filter(post => {
       const matchesSearch = post.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                            post.excerpt.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                            post.tags.some(tag => tag.toLowerCase().includes(debouncedSearch.toLowerCase()))
 
       const matchesCategory = selectedCategory === 'all' || 
-                             post.categories.some(cat => cat.title === selectedCategory)
+                             post.categories.includes(selectedCategory)
 
       const matchesTag = selectedTag === 'all' || post.tags.includes(selectedTag)
 
@@ -123,9 +53,9 @@ export default function BlogIndex() {
         case 'oldest':
           return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
         case 'reading-time-asc':
-          return a.readingTime - b.readingTime
+          return a.readingTime.minutes - b.readingTime.minutes
         case 'reading-time-desc':
-          return b.readingTime - a.readingTime
+          return b.readingTime.minutes - a.readingTime.minutes
         case 'alphabetical':
           return a.title.localeCompare(b.title)
         case 'newest':
@@ -135,9 +65,9 @@ export default function BlogIndex() {
     })
 
     return filtered
-  }, [debouncedSearch, selectedCategory, selectedTag, sortBy])
+  }, [initialPosts, debouncedSearch, selectedCategory, selectedTag, sortBy])
 
-  const featuredPost = mockBlogPosts.find(post => post.featured)
+  const featuredPost = initialPosts.find(post => post.featured)
   const regularPosts = filteredPosts.filter(post => !post.featured)
 
   return (
@@ -171,13 +101,12 @@ export default function BlogIndex() {
             {/* Search Bar */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              />
+              <button
+                onClick={() => setShowSearch(true)}
+                className="w-full text-left pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-500 dark:text-gray-400"
+              >
+                Search articles...
+              </button>
             </div>
 
             {/* Filter Toggle */}
@@ -294,6 +223,9 @@ export default function BlogIndex() {
           </div>
         </FadeIn>
       )}
+
+      {/* Search Modal */}
+      <BlogSearch isOpen={showSearch} onClose={() => setShowSearch(false)} />
     </div>
   )
 }

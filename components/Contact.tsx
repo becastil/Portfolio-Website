@@ -17,6 +17,7 @@ export default function Contact() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [formTimestamp] = useState(() => Date.now().toString())
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -31,12 +32,38 @@ export default function Contact() {
     setIsSubmitting(true)
     setErrors({})
     
-    // Simulate form submission
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // In production, you would send the data to your API endpoint
-      console.log('Form submitted:', formData)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          formTimestamp,
+          website: '', // Honeypot field
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please wait before trying again.')
+        } else if (data.details) {
+          // Handle validation errors from server
+          const serverErrors: FormErrors = {}
+          data.details.forEach((detail: { field: string; message: string }) => {
+            if (detail.field in formData) {
+              serverErrors[detail.field as keyof FormErrors] = detail.message
+            }
+          })
+          setErrors(serverErrors)
+          return
+        } else {
+          throw new Error(data.error || 'Failed to send message')
+        }
+      }
       
       setSubmitStatus('success')
       setFormData({ name: '', email: '', subject: '', message: '' })
@@ -46,6 +73,19 @@ export default function Contact() {
     } catch (error) {
       setSubmitStatus('error')
       console.error('Form submission error:', error)
+      
+      // Set a user-friendly error message
+      if (error instanceof Error) {
+        setErrors({ message: error.message })
+      } else {
+        setErrors({ message: 'Something went wrong. Please try again later.' })
+      }
+      
+      // Reset error status after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus('idle')
+        setErrors({})
+      }, 5000)
     } finally {
       setIsSubmitting(false)
     }
@@ -76,6 +116,18 @@ export default function Contact() {
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-6" aria-label="Contact form">
+            {/* Honeypot field - hidden from users */}
+            <div style={{ display: 'none' }} aria-hidden="true">
+              <label htmlFor="website">Website (leave blank)</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+            
             <div>
               <label htmlFor="name" className="form-label">
                 Name <span aria-label="required">*</span>

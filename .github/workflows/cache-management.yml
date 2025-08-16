@@ -1,0 +1,356 @@
+name: Cache Management & Optimization
+
+on:
+  schedule:
+    # Clean up caches weekly on Sundays at 4 AM UTC
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      cache_action:
+        description: 'Cache action to perform'
+        required: true
+        default: 'cleanup'
+        type: choice
+        options:
+          - cleanup
+          - rebuild
+          - analyze
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  cache-analysis:
+    name: Cache Usage Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Analyze cache usage
+        run: |
+          echo "# Cache Usage Analysis" > cache-analysis.md
+          echo "" >> cache-analysis.md
+          echo "Generated on: $(date)" >> cache-analysis.md
+          echo "" >> cache-analysis.md
+          
+          echo "## Cache Patterns in Use" >> cache-analysis.md
+          echo "- Node.js dependencies (npm cache)" >> cache-analysis.md
+          echo "- Next.js build cache" >> cache-analysis.md
+          echo "- Playwright browsers" >> cache-analysis.md
+          echo "- GitHub Actions cache" >> cache-analysis.md
+          echo "" >> cache-analysis.md
+          
+          echo "## Cache Keys Strategy" >> cache-analysis.md
+          echo "### Dependencies Cache" >> cache-analysis.md
+          echo "- Key: \`portfolio-ci-v1-\${{ hashFiles('package-lock.json') }}\`" >> cache-analysis.md
+          echo "- Scope: Project dependencies" >> cache-analysis.md
+          echo "- TTL: Until package-lock.json changes" >> cache-analysis.md
+          echo "" >> cache-analysis.md
+          
+          echo "### Build Cache" >> cache-analysis.md
+          echo "- Key: \`nextjs-\${{ hashFiles('package-lock.json') }}-\${{ hashFiles('source-files') }}\`" >> cache-analysis.md
+          echo "- Scope: Next.js build artifacts" >> cache-analysis.md
+          echo "- TTL: Until source files change" >> cache-analysis.md
+          echo "" >> cache-analysis.md
+          
+          echo "### Browser Cache" >> cache-analysis.md
+          echo "- Key: \`playwright-browsers-\${{ browser }}-\${{ hashFiles('package-lock.json') }}\`" >> cache-analysis.md
+          echo "- Scope: Playwright browser binaries" >> cache-analysis.md
+          echo "- TTL: Until Playwright version changes" >> cache-analysis.md
+          echo "" >> cache-analysis.md
+          
+          echo "## Recommendations" >> cache-analysis.md
+          echo "- Cache hit ratio should be >80% for optimal performance" >> cache-analysis.md
+          echo "- Monitor cache size to avoid GitHub limits (10GB per repo)" >> cache-analysis.md
+          echo "- Use cache versioning for breaking changes" >> cache-analysis.md
+          echo "- Implement cache cleanup for old entries" >> cache-analysis.md
+
+      - name: Check package-lock.json stability
+        run: |
+          echo "" >> cache-analysis.md
+          echo "## Package Lock Stability" >> cache-analysis.md
+          
+          # Check if package-lock.json has changed recently
+          LAST_MODIFIED=$(git log -1 --format="%cr" -- package-lock.json)
+          echo "- Last modified: $LAST_MODIFIED" >> cache-analysis.md
+          
+          # Check dependencies count
+          DEP_COUNT=$(jq '.dependencies | length' package-lock.json)
+          DEV_DEP_COUNT=$(jq '.devDependencies | length' package.json)
+          echo "- Production dependencies: $DEP_COUNT" >> cache-analysis.md
+          echo "- Development dependencies: $DEV_DEP_COUNT" >> cache-analysis.md
+
+      - name: Upload cache analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: cache-analysis
+          path: cache-analysis.md
+          retention-days: 30
+
+  cache-cleanup:
+    name: Cache Cleanup
+    runs-on: ubuntu-latest
+    if: github.event.inputs.cache_action == 'cleanup' || github.event_name == 'schedule'
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List current caches
+        id: list-caches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            console.log(`Found ${caches.data.total_count} cache entries`);
+            
+            let totalSize = 0;
+            const oldCaches = [];
+            const now = new Date();
+            
+            for (const cache of caches.data.actions_caches) {
+              totalSize += cache.size_in_bytes;
+              
+              const cacheDate = new Date(cache.last_accessed_at || cache.created_at);
+              const daysDiff = (now - cacheDate) / (1000 * 60 * 60 * 24);
+              
+              console.log(`Cache: ${cache.key}, Size: ${(cache.size_in_bytes / 1024 / 1024).toFixed(2)}MB, Age: ${daysDiff.toFixed(1)} days`);
+              
+              // Mark caches older than 30 days for deletion
+              if (daysDiff > 30) {
+                oldCaches.push(cache);
+              }
+            }
+            
+            console.log(`Total cache size: ${(totalSize / 1024 / 1024 / 1024).toFixed(2)}GB`);
+            console.log(`Old caches to delete: ${oldCaches.length}`);
+            
+            core.setOutput('total-size', (totalSize / 1024 / 1024 / 1024).toFixed(2));
+            core.setOutput('old-caches', JSON.stringify(oldCaches));
+
+      - name: Delete old caches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const oldCaches = JSON.parse('${{ steps.list-caches.outputs.old-caches }}');
+            
+            for (const cache of oldCaches) {
+              try {
+                await github.rest.actions.deleteActionsCacheById({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  cache_id: cache.id
+                });
+                console.log(`Deleted cache: ${cache.key}`);
+              } catch (error) {
+                console.log(`Failed to delete cache ${cache.key}: ${error.message}`);
+              }
+            }
+
+      - name: Generate cleanup report
+        run: |
+          echo "# Cache Cleanup Report" > cleanup-report.md
+          echo "" >> cleanup-report.md
+          echo "Cleanup performed on: $(date)" >> cleanup-report.md
+          echo "" >> cleanup-report.md
+          echo "## Summary" >> cleanup-report.md
+          echo "- Total cache size: ${{ steps.list-caches.outputs.total-size }}GB" >> cleanup-report.md
+          echo "- Old caches removed: $(echo '${{ steps.list-caches.outputs.old-caches }}' | jq length)" >> cleanup-report.md
+          echo "" >> cleanup-report.md
+          echo "## Next Cleanup" >> cleanup-report.md
+          echo "- Scheduled: Next Sunday at 4 AM UTC" >> cleanup-report.md
+          echo "- Manual: Run workflow_dispatch with 'cleanup' action" >> cleanup-report.md
+
+      - name: Upload cleanup report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cache-cleanup-report
+          path: cleanup-report.md
+          retention-days: 30
+
+  cache-rebuild:
+    name: Cache Rebuild
+    runs-on: ubuntu-latest
+    if: github.event.inputs.cache_action == 'rebuild'
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        cache-type: [dependencies, build, playwright]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Clear existing cache
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const cachePatterns = {
+              dependencies: 'portfolio-ci-v1-',
+              build: 'nextjs-',
+              playwright: 'playwright-browsers-'
+            };
+            
+            const pattern = cachePatterns['${{ matrix.cache-type }}'];
+            
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            for (const cache of caches.data.actions_caches) {
+              if (cache.key.startsWith(pattern)) {
+                try {
+                  await github.rest.actions.deleteActionsCacheById({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    cache_id: cache.id
+                  });
+                  console.log(`Deleted cache: ${cache.key}`);
+                } catch (error) {
+                  console.log(`Failed to delete cache ${cache.key}: ${error.message}`);
+                }
+              }
+            }
+
+      - name: Rebuild dependencies cache
+        if: matrix.cache-type == 'dependencies'
+        run: |
+          echo "Rebuilding dependencies cache..."
+          npm ci --prefer-offline
+          echo "Dependencies cache rebuilt"
+
+      - name: Rebuild build cache
+        if: matrix.cache-type == 'build'
+        run: |
+          echo "Rebuilding build cache..."
+          npm ci
+          npm run build
+          echo "Build cache rebuilt"
+
+      - name: Rebuild Playwright cache
+        if: matrix.cache-type == 'playwright'
+        run: |
+          echo "Rebuilding Playwright cache..."
+          npm ci
+          npm install -D @playwright/test
+          npx playwright install chromium firefox webkit
+          echo "Playwright cache rebuilt"
+
+  performance-optimization:
+    name: CI Performance Optimization
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Measure build performance
+        run: |
+          echo "# CI Performance Report" > performance-report.md
+          echo "" >> performance-report.md
+          echo "Generated on: $(date)" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          # Measure dependency installation time
+          echo "## Dependency Installation Performance" >> performance-report.md
+          start_time=$(date +%s)
+          npm ci --prefer-offline
+          end_time=$(date +%s)
+          install_duration=$((end_time - start_time))
+          echo "- Duration: ${install_duration}s" >> performance-report.md
+          echo "- Method: npm ci with offline preference" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          # Measure build time
+          echo "## Build Performance" >> performance-report.md
+          start_time=$(date +%s)
+          npm run build
+          end_time=$(date +%s)
+          build_duration=$((end_time - start_time))
+          echo "- Duration: ${build_duration}s" >> performance-report.md
+          echo "- Output size: $(du -sh out | cut -f1)" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          # Cache effectiveness
+          echo "## Cache Effectiveness" >> performance-report.md
+          if [ "$install_duration" -lt 30 ]; then
+            echo "- ✅ Dependency cache: Highly effective (<30s)" >> performance-report.md
+          elif [ "$install_duration" -lt 60 ]; then
+            echo "- ⚠️ Dependency cache: Moderately effective (30-60s)" >> performance-report.md
+          else
+            echo "- ❌ Dependency cache: Poor effectiveness (>60s)" >> performance-report.md
+          fi
+          
+          if [ "$build_duration" -lt 60 ]; then
+            echo "- ✅ Build cache: Highly effective (<60s)" >> performance-report.md
+          elif [ "$build_duration" -lt 120 ]; then
+            echo "- ⚠️ Build cache: Moderately effective (60-120s)" >> performance-report.md
+          else
+            echo "- ❌ Build cache: Poor effectiveness (>120s)" >> performance-report.md
+          fi
+          
+          echo "" >> performance-report.md
+          echo "## Optimization Recommendations" >> performance-report.md
+          
+          if [ "$install_duration" -gt 60 ]; then
+            echo "- Consider using npm ci with --prefer-offline flag" >> performance-report.md
+            echo "- Verify package-lock.json is committed and stable" >> performance-report.md
+          fi
+          
+          if [ "$build_duration" -gt 120 ]; then
+            echo "- Implement incremental build caching" >> performance-report.md
+            echo "- Consider build output caching strategies" >> performance-report.md
+          fi
+          
+          echo "- Use parallel job execution where possible" >> performance-report.md
+          echo "- Implement conditional workflow execution" >> performance-report.md
+
+      - name: Analyze workflow parallelization
+        run: |
+          echo "" >> performance-report.md
+          echo "## Workflow Parallelization Analysis" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "### Current Parallel Jobs" >> performance-report.md
+          echo "- CI workflow: 5 parallel jobs (preflight, code-quality, security, build-test, accessibility)" >> performance-report.md
+          echo "- E2E tests: Matrix strategy with 7 browser/viewport combinations" >> performance-report.md
+          echo "- Security scanning: 4 parallel scans (dependencies, CodeQL, secrets, licenses)" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "### Optimization Opportunities" >> performance-report.md
+          echo "- ✅ Jobs run in parallel where dependencies allow" >> performance-report.md
+          echo "- ✅ Matrix strategies used for E2E testing" >> performance-report.md
+          echo "- ✅ Conditional execution based on file changes" >> performance-report.md
+          echo "- ⚠️ Consider caching Playwright browsers between jobs" >> performance-report.md
+
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-performance-report
+          path: performance-report.md
+          retention-days: 30

@@ -25,47 +25,14 @@ import TableOfContents from './TableOfContents'
 import ShareButtons from './ShareButtons'
 import RelatedPosts from './RelatedPosts'
 
+import { BlogPost as BlogPostType, BlogPostPreview } from '@/types'
+
 interface BlogPostProps {
-  post: {
-    _id: string
-    title: string
-    slug: { current: string }
-    excerpt: string
-    mainImage: {
-      asset: { url: string }
-      alt: string
-    }
-    author: {
-      name: string
-      slug: { current: string }
-      bio: string
-      image: { asset: { url: string } }
-    }
-    categories: { title: string, slug: { current: string } }[]
-    tags: string[]
-    publishedAt: string
-    updatedAt?: string
-    readingTime: number
-    featured?: boolean
-    content: Array<{
-      _type: string
-      [key: string]: unknown
-    }>
-    relatedArticles?: Array<{
-      _id: string
-      title: string
-      slug: { current: string }
-      excerpt: string
-    }>
-    series?: {
-      title: string
-      order: number
-      total: number
-    }
-  }
+  post: BlogPostType
+  relatedPosts?: BlogPostPreview[]
 }
 
-export default function BlogPost({ post }: BlogPostProps) {
+export default function BlogPost({ post, relatedPosts }: BlogPostProps) {
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [activeHeading, setActiveHeading] = useState('')
   const contentRef = useRef<HTMLDivElement>(null)
@@ -105,16 +72,6 @@ export default function BlogPost({ post }: BlogPostProps) {
       })
     : null
 
-  // Mock table of contents - in real app, extract from content
-  const tableOfContents = [
-    { id: 'introduction', title: 'Introduction to Framer Motion', level: 2 },
-    { id: 'installation', title: 'Installation and Setup', level: 2 },
-    { id: 'basic-animations', title: 'Basic Animations', level: 2 },
-    { id: 'layout-animations', title: 'Layout Animations', level: 3 },
-    { id: 'gesture-animations', title: 'Gesture-based Animations', level: 3 },
-    { id: 'performance', title: 'Performance Considerations', level: 2 },
-    { id: 'conclusion', title: 'Conclusion', level: 2 },
-  ]
 
   return (
     <div ref={contentRef} className="relative">
@@ -127,7 +84,7 @@ export default function BlogPost({ post }: BlogPostProps) {
           className="absolute inset-0 z-0"
         >
           <Image
-            src={post.mainImage.asset.url}
+            src={post.mainImage.url}
             alt={post.mainImage.alt}
             fill
             className="object-cover"
@@ -163,13 +120,13 @@ export default function BlogPost({ post }: BlogPostProps) {
             <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
               {post.categories.map((category, index) => (
                 <motion.span
-                  key={category.slug.current}
+                  key={category}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm text-blue-200 text-sm font-medium rounded-full border border-blue-300/30"
                 >
-                  {category.title}
+                  {category}
                 </motion.span>
               ))}
               {post.featured && (
@@ -212,7 +169,7 @@ export default function BlogPost({ post }: BlogPostProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5" />
-                <span>{post.readingTime} min read</span>
+                <span>{post.readingTime.text}</span>
               </div>
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -230,7 +187,7 @@ export default function BlogPost({ post }: BlogPostProps) {
           {/* Share Buttons */}
           <FadeIn delay={1.4}>
             <ShareButtons 
-              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/blog/${post.slug.current}`}
+              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/blog/${post.slug}`}
               title={post.title}
               description={post.excerpt}
             />
@@ -256,7 +213,7 @@ export default function BlogPost({ post }: BlogPostProps) {
             <aside className="lg:col-span-1">
               <div className="lg:sticky lg:top-8">
                 <TableOfContents 
-                  headings={tableOfContents}
+                  headings={post.tableOfContents}
                   activeHeading={activeHeading}
                   onHeadingClick={setActiveHeading}
                 />
@@ -267,64 +224,12 @@ export default function BlogPost({ post }: BlogPostProps) {
             <article className="lg:col-span-3">
               <AnimatedSection className="prose prose-lg dark:prose-invert max-w-none">
                 {/* Article Body */}
-                <div className="space-y-8">
-                  <FadeIn>
-                    <h2 id="introduction" className="scroll-mt-24">Introduction to Framer Motion</h2>
-                    <p>
-                      Framer Motion is a production-ready motion library for React that brings your components to life with smooth, 
-                      performant animations. In this comprehensive guide, we&apos;ll explore how to leverage its powerful features to 
-                      create engaging user experiences that enhance rather than distract from your content.
-                    </p>
-                  </FadeIn>
-
-                  <SlideIn direction="right" delay={0.2}>
-                    <h2 id="installation" className="scroll-mt-24">Installation and Setup</h2>
-                    <p>
-                      Getting started with Framer Motion is straightforward. Let&apos;s walk through the installation process and 
-                      basic configuration to get you up and running quickly.
-                    </p>
-                    <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">
-                      <code>npm install framer-motion</code>
-                    </pre>
-                  </SlideIn>
-
-                  <FadeIn delay={0.4}>
-                    <h2 id="basic-animations" className="scroll-mt-24">Basic Animations</h2>
-                    <p>
-                      The foundation of any good animation system is a solid understanding of basic principles. 
-                      Framer Motion provides intuitive APIs that make complex animations feel simple.
-                    </p>
-                    
-                    <h3 id="layout-animations" className="scroll-mt-24">Layout Animations</h3>
-                    <p>
-                      One of Framer Motion&apos;s most powerful features is its ability to automatically animate between layouts. 
-                      This creates smooth transitions when elements change size, position, or structure.
-                    </p>
-
-                    <h3 id="gesture-animations" className="scroll-mt-24">Gesture-based Animations</h3>
-                    <p>
-                      Interactive animations respond to user input, creating a more engaging experience. 
-                      Learn how to implement drag, hover, and tap animations that feel natural and responsive.
-                    </p>
-                  </FadeIn>
-
-                  <SlideIn direction="left" delay={0.6}>
-                    <h2 id="performance" className="scroll-mt-24">Performance Considerations</h2>
-                    <p>
-                      While animations can greatly enhance user experience, they must be implemented thoughtfully to avoid 
-                      performance issues. We&apos;ll cover optimization techniques and best practices for smooth 60fps animations.
-                    </p>
-                  </SlideIn>
-
-                  <FadeIn delay={0.8}>
-                    <h2 id="conclusion" className="scroll-mt-24">Conclusion</h2>
-                    <p>
-                      Framer Motion opens up a world of possibilities for creating engaging, interactive web experiences. 
-                      By following the principles and techniques outlined in this guide, you&apos;ll be well-equipped to add 
-                      meaningful animations to your React applications.
-                    </p>
-                  </FadeIn>
-                </div>
+                <FadeIn>
+                  <div 
+                    className="space-y-8"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+                </FadeIn>
 
                 {/* Tags */}
                 <AnimatedSection delay={1} className="pt-12 border-t border-gray-200 dark:border-gray-700">
@@ -354,7 +259,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                       transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
                     >
                       <Image
-                        src={post.author.image.asset.url}
+                        src={post.author.avatar}
                         alt={post.author.name}
                         width={80}
                         height={80}
@@ -377,10 +282,10 @@ export default function BlogPost({ post }: BlogPostProps) {
         </div>
 
         {/* Related Posts */}
-        {post.relatedArticles && post.relatedArticles.length > 0 && (
+        {relatedPosts && relatedPosts.length > 0 && (
           <section className="bg-gray-50 dark:bg-gray-800/50 py-16">
             <div className="container mx-auto px-4 max-w-7xl">
-              <RelatedPosts posts={post.relatedArticles} />
+              <RelatedPosts posts={relatedPosts} />
             </div>
           </section>
         )}

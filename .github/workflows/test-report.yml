@@ -1,0 +1,372 @@
+name: Test Reporting & Quality Dashboard
+
+on:
+  workflow_run:
+    workflows: [
+      "Continuous Integration",
+      "End-to-End Tests", 
+      "Lighthouse CI & Performance",
+      "Security Scanning"
+    ]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  actions: read
+
+jobs:
+  collect-reports:
+    name: Collect Test Reports
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'skipped'
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download workflow artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Get all artifacts from the completed workflow
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }},
+            });
+            
+            console.log(`Found ${artifacts.data.artifacts.length} artifacts`);
+            
+            // Download relevant artifacts
+            const reportArtifacts = artifacts.data.artifacts.filter(artifact => 
+              artifact.name.includes('report') || 
+              artifact.name.includes('results') ||
+              artifact.name.includes('summary')
+            );
+            
+            for (const artifact of reportArtifacts) {
+              console.log(`Downloading artifact: ${artifact.name}`);
+              
+              try {
+                const download = await github.rest.actions.downloadArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                  archive_format: 'zip',
+                });
+                
+                fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+                console.log(`Downloaded: ${artifact.name}.zip`);
+              } catch (error) {
+                console.log(`Failed to download ${artifact.name}: ${error.message}`);
+              }
+            }
+
+      - name: Extract and process reports
+        run: |
+          # Create reports directory
+          mkdir -p reports
+          
+          # Extract downloaded artifacts
+          for zip in *.zip; do
+            if [ -f "$zip" ]; then
+              echo "Extracting $zip..."
+              unzip -q "$zip" -d "reports/$(basename "$zip" .zip)" || true
+            fi
+          done
+          
+          # List all extracted files
+          echo "Extracted files:"
+          find reports -type f | head -20
+
+      - name: Generate comprehensive test report
+        run: |
+          echo "# Comprehensive Test Report" > test-dashboard.md
+          echo "" >> test-dashboard.md
+          echo "Generated on: $(date)" >> test-dashboard.md
+          echo "Workflow: ${{ github.event.workflow_run.name }}" >> test-dashboard.md
+          echo "Status: ${{ github.event.workflow_run.conclusion }}" >> test-dashboard.md
+          echo "Commit: ${{ github.event.workflow_run.head_sha }}" >> test-dashboard.md
+          echo "Branch: ${{ github.event.workflow_run.head_branch }}" >> test-dashboard.md
+          echo "" >> test-dashboard.md
+          
+          # Overall Status
+          echo "## Overall Status" >> test-dashboard.md
+          if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "✅ **PASSED** - All quality gates met" >> test-dashboard.md
+          elif [ "${{ github.event.workflow_run.conclusion }}" = "failure" ]; then
+            echo "❌ **FAILED** - Quality gates not met" >> test-dashboard.md
+          else
+            echo "⚠️ **INCOMPLETE** - Workflow did not complete successfully" >> test-dashboard.md
+          fi
+          echo "" >> test-dashboard.md
+          
+          # Workflow Summary
+          echo "## Workflow Summary" >> test-dashboard.md
+          echo "| Metric | Value |" >> test-dashboard.md
+          echo "|--------|-------|" >> test-dashboard.md
+          echo "| Workflow | ${{ github.event.workflow_run.name }} |" >> test-dashboard.md
+          echo "| Duration | ${{ github.event.workflow_run.updated_at }} |" >> test-dashboard.md
+          echo "| Conclusion | ${{ github.event.workflow_run.conclusion }} |" >> test-dashboard.md
+          echo "| Attempt | ${{ github.event.workflow_run.run_attempt }} |" >> test-dashboard.md
+          echo "" >> test-dashboard.md
+          
+          # Include individual reports
+          echo "## Detailed Reports" >> test-dashboard.md
+          
+          # Process CI reports
+          if [ -d "reports/eslint-report" ]; then
+            echo "### Code Quality (ESLint)" >> test-dashboard.md
+            if [ -f "reports/eslint-report/eslint-report.json" ]; then
+              ERRORS=$(jq '[.[] | .errorCount] | add // 0' reports/eslint-report/eslint-report.json)
+              WARNINGS=$(jq '[.[] | .warningCount] | add // 0' reports/eslint-report/eslint-report.json)
+              echo "- Errors: $ERRORS" >> test-dashboard.md
+              echo "- Warnings: $WARNINGS" >> test-dashboard.md
+            fi
+            echo "" >> test-dashboard.md
+          fi
+          
+          # Process Lighthouse reports
+          if [ -d "reports/lighthouse-results" ] || [ -d "reports/lighthouse-performance-report" ]; then
+            echo "### Performance (Lighthouse)" >> test-dashboard.md
+            echo "Lighthouse performance tests completed." >> test-dashboard.md
+            echo "" >> test-dashboard.md
+          fi
+          
+          # Process E2E reports
+          if [ -d "reports/playwright-results" ] || ls reports/playwright-results-* 2>/dev/null; then
+            echo "### End-to-End Tests (Playwright)" >> test-dashboard.md
+            echo "E2E tests completed across multiple browsers and viewports." >> test-dashboard.md
+            echo "" >> test-dashboard.md
+          fi
+          
+          # Process Security reports
+          if [ -d "reports/security-report" ] || [ -d "reports/security-summary" ]; then
+            echo "### Security Scanning" >> test-dashboard.md
+            echo "Security scans completed." >> test-dashboard.md
+            echo "" >> test-dashboard.md
+          fi
+          
+          # Process Accessibility reports
+          if [ -d "reports/axe-results" ]; then
+            echo "### Accessibility (Axe)" >> test-dashboard.md
+            echo "Accessibility tests completed." >> test-dashboard.md
+            echo "" >> test-dashboard.md
+          fi
+          
+          echo "## Next Steps" >> test-dashboard.md
+          if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "- ✅ All quality gates passed" >> test-dashboard.md
+            echo "- 🚀 Ready for deployment" >> test-dashboard.md
+          else
+            echo "- 🔍 Review failed checks" >> test-dashboard.md
+            echo "- 🛠️ Fix issues before deployment" >> test-dashboard.md
+            echo "- 📊 Check detailed reports for specific failures" >> test-dashboard.md
+          fi
+          
+          echo "" >> test-dashboard.md
+          echo "---" >> test-dashboard.md
+          echo "*This report was generated automatically by the CI/CD pipeline*" >> test-dashboard.md
+
+      - name: Create quality metrics summary
+        run: |
+          echo "# Quality Metrics Summary" > quality-metrics.json
+          
+          # Basic structure
+          cat > quality-metrics.json << 'EOF'
+          {
+            "timestamp": "$(date -Iseconds)",
+            "workflow": "${{ github.event.workflow_run.name }}",
+            "status": "${{ github.event.workflow_run.conclusion }}",
+            "commit": "${{ github.event.workflow_run.head_sha }}",
+            "branch": "${{ github.event.workflow_run.head_branch }}",
+            "metrics": {
+              "code_quality": {
+                "eslint_errors": 0,
+                "eslint_warnings": 0,
+                "typescript_errors": 0
+              },
+              "performance": {
+                "lighthouse_performance": null,
+                "lighthouse_accessibility": null,
+                "lighthouse_seo": null,
+                "lighthouse_best_practices": null
+              },
+              "testing": {
+                "e2e_tests_passed": null,
+                "e2e_tests_failed": null,
+                "accessibility_violations": null
+              },
+              "security": {
+                "critical_vulnerabilities": null,
+                "high_vulnerabilities": null
+              }
+            }
+          }
+          EOF
+
+      - name: Upload comprehensive report
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-test-report-${{ github.event.workflow_run.id }}
+          path: |
+            test-dashboard.md
+            quality-metrics.json
+            reports/
+          retention-days: 30
+
+      - name: Comment on related PR
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Get the PR number from the workflow run
+            const pulls = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${{ github.event.workflow_run.head_branch }}`,
+              state: 'open'
+            });
+            
+            if (pulls.data.length === 0) {
+              console.log('No open PR found for this branch');
+              return;
+            }
+            
+            const prNumber = pulls.data[0].number;
+            
+            let report = "## Test Report Summary\\n\\n";
+            
+            if (fs.existsSync('test-dashboard.md')) {
+              report = fs.readFileSync('test-dashboard.md', 'utf8');
+            } else {
+              report += `Workflow **${{ github.event.workflow_run.name }}** completed with status: **${{ github.event.workflow_run.conclusion }}**\\n\\n`;
+              
+              if ('${{ github.event.workflow_run.conclusion }}' === 'success') {
+                report += '✅ All quality gates passed!\\n';
+              } else {
+                report += '❌ Some quality gates failed. Please review the workflow logs.\\n';
+              }
+            }
+            
+            // Add workflow link
+            report += `\\n[View full workflow run](${{ github.event.workflow_run.html_url }})`;
+            
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+  quality-trend-analysis:
+    name: Quality Trend Analysis
+    runs-on: ubuntu-latest
+    needs: collect-reports
+    if: always()
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download current report
+        uses: actions/download-artifact@v4
+        with:
+          name: comprehensive-test-report-${{ github.event.workflow_run.id }}
+          path: current-report/
+
+      - name: Analyze quality trends
+        run: |
+          echo "# Quality Trend Analysis" > trend-analysis.md
+          echo "" >> trend-analysis.md
+          echo "This analysis compares current quality metrics with historical data." >> trend-analysis.md
+          echo "" >> trend-analysis.md
+          
+          # Basic trend analysis (would be enhanced with actual historical data)
+          echo "## Current Metrics" >> trend-analysis.md
+          if [ -f "current-report/quality-metrics.json" ]; then
+            echo "Quality metrics captured for trend analysis." >> trend-analysis.md
+          else
+            echo "No quality metrics found." >> trend-analysis.md
+          fi
+          
+          echo "" >> trend-analysis.md
+          echo "## Recommendations" >> trend-analysis.md
+          
+          if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "- ✅ Quality standards maintained" >> trend-analysis.md
+            echo "- 🎯 Continue current development practices" >> trend-analysis.md
+          else
+            echo "- ⚠️ Quality regression detected" >> trend-analysis.md
+            echo "- 🔍 Review recent changes for quality impact" >> trend-analysis.md
+            echo "- 📈 Consider enhancing quality gates" >> trend-analysis.md
+          fi
+
+      - name: Upload trend analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-trend-analysis
+          path: trend-analysis.md
+          retention-days: 90
+
+  notify-team:
+    name: Team Notifications
+    runs-on: ubuntu-latest
+    needs: [collect-reports, quality-trend-analysis]
+    if: always()
+    timeout-minutes: 5
+    steps:
+      - name: Prepare notification
+        run: |
+          echo "WORKFLOW_NAME=${{ github.event.workflow_run.name }}" >> $GITHUB_ENV
+          echo "WORKFLOW_STATUS=${{ github.event.workflow_run.conclusion }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+          echo "BRANCH_NAME=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_ENV
+
+      - name: Log notification details
+        run: |
+          echo "🔔 Quality Pipeline Notification"
+          echo "Workflow: $WORKFLOW_NAME"
+          echo "Status: $WORKFLOW_STATUS"
+          echo "Commit: $COMMIT_SHA"
+          echo "Branch: $BRANCH_NAME"
+          
+          if [ "$WORKFLOW_STATUS" = "success" ]; then
+            echo "✅ All quality gates passed!"
+          elif [ "$WORKFLOW_STATUS" = "failure" ]; then
+            echo "❌ Quality gates failed - review required"
+          else
+            echo "⚠️ Workflow completed with status: $WORKFLOW_STATUS"
+          fi
+
+      - name: Create notification summary
+        run: |
+          echo "# Quality Pipeline Notification" > notification.md
+          echo "" >> notification.md
+          echo "**Workflow:** $WORKFLOW_NAME" >> notification.md
+          echo "**Status:** $WORKFLOW_STATUS" >> notification.md
+          echo "**Commit:** $COMMIT_SHA" >> notification.md
+          echo "**Branch:** $BRANCH_NAME" >> notification.md
+          echo "**Time:** $(date)" >> notification.md
+          echo "" >> notification.md
+          
+          if [ "$WORKFLOW_STATUS" = "success" ]; then
+            echo "🎉 **Success!** All quality gates passed." >> notification.md
+          elif [ "$WORKFLOW_STATUS" = "failure" ]; then
+            echo "🚨 **Attention Required!** Quality gates failed." >> notification.md
+          fi
+
+      - name: Upload notification
+        uses: actions/upload-artifact@v4
+        with:
+          name: team-notification
+          path: notification.md
+          retention-days: 7

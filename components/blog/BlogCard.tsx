@@ -6,25 +6,10 @@ import Image from 'next/image'
 import { Calendar, Clock, Tag, ArrowRight, Star } from 'lucide-react'
 import { FadeIn, ScaleIn } from '@/components/animations'
 
-interface BlogPost {
-  _id: string
-  title: string
-  slug: { current: string }
-  excerpt: string
-  mainImage: {
-    asset: { url: string }
-    alt: string
-  }
-  author: { name: string, slug: { current: string } }
-  categories: { title: string, slug: { current: string } }[]
-  tags: string[]
-  publishedAt: string
-  readingTime: number
-  featured?: boolean
-}
+import { BlogPostPreview } from '@/types'
 
 interface BlogCardProps {
-  post: BlogPost
+  post: BlogPostPreview
   featured?: boolean
 }
 
@@ -64,7 +49,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Image
-                  src={post.mainImage.asset.url}
+                  src={post.mainImage.url}
                   alt={post.mainImage.alt}
                   width={600}
                   height={400}
@@ -79,13 +64,13 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.categories.map((category, index) => (
                   <motion.span
-                    key={category.slug.current}
+                    key={category}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.1 }}
                     className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium rounded-full"
                   >
-                    {category.title}
+                    {category}
                   </motion.span>
                 ))}
               </div>
@@ -110,13 +95,13 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    {post.readingTime} min read
+                    {post.readingTime.text}
                   </div>
                 </div>
               </FadeIn>
 
               <FadeIn delay={0.8}>
-                <Link href={`/blog/${post.slug.current}`}>
+                <Link href={`/blog/${post.slug}`}>
                   <motion.div
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg shadow-lg group-hover:shadow-xl transition-shadow"
                     whileHover={{ scale: 1.05, x: 5 }}
@@ -148,7 +133,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             <Image
-              src={post.mainImage.asset.url}
+              src={post.mainImage.url}
               alt={post.mainImage.alt}
               width={400}
               height={250}
@@ -165,7 +150,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="px-2 py-1 bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full backdrop-blur-sm"
             >
-              {post.categories[0]?.title}
+              {post.categories[0]}
             </motion.span>
           </div>
         </div>
@@ -217,11 +202,11 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {post.readingTime}m
+                  {post.readingTime.minutes}m
                 </div>
               </div>
 
-              <Link href={`/blog/${post.slug.current}`}>
+              <Link href={`/blog/${post.slug}`}>
                 <motion.div
                   className="flex items-center gap-1 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm group"
                   whileHover={{ x: 5 }}

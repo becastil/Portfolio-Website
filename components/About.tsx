@@ -4,14 +4,14 @@ import { motion } from 'framer-motion'
 
 export default function About() {
   return (
-    <section id="about" className="section bg-background" aria-labelledby="about-heading">
+    <section id="about" className="section bg-background content-auto" aria-labelledby="about-heading">
       <div className="container">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="max-w-[70ch] mx-auto text-center"
+          className="max-w-[70ch] mx-auto text-center layout-stable"
         >
           <h2 id="about-heading" className="text-4xl font-bold text-text-primary mb-8">
             About

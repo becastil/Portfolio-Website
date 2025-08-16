@@ -1,0 +1,327 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security scans weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  pull-requests: write
+
+jobs:
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --audit
+
+      - name: Run npm audit
+        continue-on-error: true
+        run: |
+          echo "Running npm audit..."
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+
+      - name: Process audit results
+        run: |
+          if [ -f npm-audit.json ]; then
+            echo "## Security Audit Results" > security-report.md
+            echo "" >> security-report.md
+            
+            # Extract vulnerability counts
+            CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit.json)
+            HIGH=$(jq '.metadata.vulnerabilities.high // 0' npm-audit.json)
+            MODERATE=$(jq '.metadata.vulnerabilities.moderate // 0' npm-audit.json)
+            LOW=$(jq '.metadata.vulnerabilities.low // 0' npm-audit.json)
+            
+            echo "| Severity | Count |" >> security-report.md
+            echo "|----------|-------|" >> security-report.md
+            echo "| Critical | $CRITICAL |" >> security-report.md
+            echo "| High | $HIGH |" >> security-report.md
+            echo "| Moderate | $MODERATE |" >> security-report.md
+            echo "| Low | $LOW |" >> security-report.md
+            echo "" >> security-report.md
+            
+            # Check for blocking vulnerabilities
+            if [ "$CRITICAL" -gt 0 ]; then
+              echo "❌ Critical vulnerabilities found: $CRITICAL" >> security-report.md
+              echo "::error::Critical vulnerabilities detected: $CRITICAL"
+              exit 1
+            elif [ "$HIGH" -gt 0 ]; then
+              echo "⚠️ High vulnerabilities found: $HIGH" >> security-report.md
+              echo "::warning::High severity vulnerabilities detected: $HIGH"
+              # Don't fail on high for now, but log warning
+            else
+              echo "✅ No critical or high severity vulnerabilities found" >> security-report.md
+            fi
+            
+            # Add details if vulnerabilities exist
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "" >> security-report.md
+              echo "### Recommended Actions" >> security-report.md
+              echo "1. Run \`npm audit fix\` to automatically fix issues" >> security-report.md
+              echo "2. Review and update vulnerable dependencies manually" >> security-report.md
+              echo "3. Consider alternative packages for unfixable vulnerabilities" >> security-report.md
+            fi
+          else
+            echo "No audit results found" > security-report.md
+          fi
+
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: |
+            security-report.md
+            npm-audit.json
+          retention-days: 30
+
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+
+  secrets-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install truffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run truffleHog scan
+        run: |
+          trufflehog git file://. --json > secrets-scan.json || true
+
+      - name: Process secrets scan results
+        run: |
+          echo "## Secrets Scanning Report" > secrets-report.md
+          echo "" >> secrets-report.md
+          echo "Scan completed on: $(date)" >> secrets-report.md
+          echo "" >> secrets-report.md
+          
+          if [ -f secrets-scan.json ]; then
+            SECRET_COUNT=$(jq length secrets-scan.json)
+            
+            if [ "$SECRET_COUNT" -gt 0 ]; then
+              echo "⚠️ Potential secrets detected: $SECRET_COUNT" >> secrets-report.md
+              echo "" >> secrets-report.md
+              echo "### Findings:" >> secrets-report.md
+              
+              # Extract detector types
+              jq -r '.[] | "- " + .DetectorName + " in " + .SourceMetadata.Data.Git.file' secrets-scan.json >> secrets-report.md
+              
+              echo "" >> secrets-report.md
+              echo "### Recommendations:" >> secrets-report.md
+              echo "1. Review identified potential secrets" >> secrets-report.md
+              echo "2. Remove any real secrets from version control" >> secrets-report.md
+              echo "3. Use environment variables or secrets management" >> secrets-report.md
+              echo "4. Update any exposed credentials" >> secrets-report.md
+              
+              echo "::warning::Potential secrets detected in repository"
+            else
+              echo "✅ No secrets detected" >> secrets-report.md
+            fi
+          else
+            echo "No secrets scan results found" >> secrets-report.md
+          fi
+
+      - name: Upload secrets report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secrets-report
+          path: |
+            secrets-report.md
+            secrets-scan.json
+          retention-days: 30
+
+  license-compliance:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install license checker
+        run: npm install -g license-checker
+
+      - name: Check licenses
+        run: |
+          license-checker --json > licenses.json || true
+
+      - name: Process license results
+        run: |
+          echo "## License Compliance Report" > license-report.md
+          echo "" >> license-report.md
+          echo "Generated on: $(date)" >> license-report.md
+          echo "" >> license-report.md
+          
+          if [ -f licenses.json ]; then
+            # Count packages by license type
+            echo "### License Distribution" >> license-report.md
+            jq -r 'to_entries[] | .value.licenses' licenses.json | sort | uniq -c | sort -nr | while read count license; do
+              echo "- $license: $count packages" >> license-report.md
+            done
+            
+            echo "" >> license-report.md
+            echo "### Potentially Problematic Licenses" >> license-report.md
+            
+            # Check for potentially problematic licenses
+            PROBLEMATIC_FOUND=false
+            for license in "GPL" "AGPL" "LGPL" "UNLICENSED"; do
+              if jq -e --arg license "$license" 'to_entries[] | select(.value.licenses | test($license; "i"))' licenses.json > /dev/null; then
+                echo "⚠️ Found packages with $license license" >> license-report.md
+                jq -r --arg license "$license" 'to_entries[] | select(.value.licenses | test($license; "i")) | "- " + .key + " (" + .value.licenses + ")"' licenses.json >> license-report.md
+                PROBLEMATIC_FOUND=true
+              fi
+            done
+            
+            if [ "$PROBLEMATIC_FOUND" = false ]; then
+              echo "✅ No problematic licenses detected" >> license-report.md
+            fi
+          else
+            echo "No license data found" >> license-report.md
+          fi
+
+      - name: Upload license report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: |
+            license-report.md
+            licenses.json
+          retention-days: 30
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, codeql-analysis, secrets-scan, license-compliance]
+    if: always()
+    steps:
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-report"
+          merge-multiple: true
+
+      - name: Generate security summary
+        run: |
+          echo "# Security Scan Summary" > security-summary.md
+          echo "" >> security-summary.md
+          echo "Generated on: $(date)" >> security-summary.md
+          echo "" >> security-summary.md
+          
+          echo "## Scan Results" >> security-summary.md
+          echo "| Scan Type | Status |" >> security-summary.md
+          echo "|-----------|--------|" >> security-summary.md
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-summary.md
+          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-summary.md
+          echo "| Secrets Scan | ${{ needs.secrets-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-summary.md
+          echo "| License Check | ${{ needs.license-compliance.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> security-summary.md
+          echo "" >> security-summary.md
+          
+          # Include individual reports if they exist
+          for report in security-report.md secrets-report.md license-report.md; do
+            if [ -f "$report" ]; then
+              echo "---" >> security-summary.md
+              cat "$report" >> security-summary.md
+              echo "" >> security-summary.md
+            fi
+          done
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = "## Security Scan Summary\\n\\nSecurity scans completed.";
+            
+            if (fs.existsSync('security-summary.md')) {
+              summary = fs.readFileSync('security-summary.md', 'utf8');
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Upload combined security summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-summary
+          path: security-summary.md
+          retention-days: 30

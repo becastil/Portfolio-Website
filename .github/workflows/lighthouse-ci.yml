@@ -1,4 +1,4 @@
-name: Lighthouse CI
+name: Lighthouse CI & Performance
 
 on:
   push:
@@ -10,24 +10,34 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '20'
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+concurrency:
+  group: lighthouse-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lighthouse:
+    name: Lighthouse Performance & Accessibility
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        node-version: [18.x]
-    
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       
       - name: Install dependencies
@@ -100,8 +110,123 @@ jobs:
             });
       
       - name: Check Lighthouse Assertions
-        if: failure()
+        id: lighthouse_check
         run: |
-          echo "Lighthouse CI assertions failed!"
-          echo "Check the results at: https://googlechrome.github.io/lighthouse/viewer/"
-          exit 1
+          # Check if Lighthouse CI passed or failed
+          if [ -f ".lighthouseci/lhr-0.json" ]; then
+            PERFORMANCE_SCORE=$(jq '.categories.performance.score' .lighthouseci/lhr-0.json)
+            ACCESSIBILITY_SCORE=$(jq '.categories.accessibility.score' .lighthouseci/lhr-0.json)
+            BEST_PRACTICES_SCORE=$(jq '.categories["best-practices"].score' .lighthouseci/lhr-0.json)
+            SEO_SCORE=$(jq '.categories.seo.score' .lighthouseci/lhr-0.json)
+            
+            echo "Performance: $PERFORMANCE_SCORE"
+            echo "Accessibility: $ACCESSIBILITY_SCORE"
+            echo "Best Practices: $BEST_PRACTICES_SCORE"
+            echo "SEO: $SEO_SCORE"
+            
+            # Check quality gates (95+ scores)
+            FAILED_GATES=""
+            
+            if (( $(echo "$PERFORMANCE_SCORE < 0.95" | bc -l) )); then
+              FAILED_GATES="$FAILED_GATES Performance"
+            fi
+            
+            if (( $(echo "$ACCESSIBILITY_SCORE < 0.95" | bc -l) )); then
+              FAILED_GATES="$FAILED_GATES Accessibility"
+            fi
+            
+            if (( $(echo "$BEST_PRACTICES_SCORE < 0.95" | bc -l) )); then
+              FAILED_GATES="$FAILED_GATES Best-Practices"
+            fi
+            
+            if (( $(echo "$SEO_SCORE < 0.95" | bc -l) )); then
+              FAILED_GATES="$FAILED_GATES SEO"
+            fi
+            
+            if [ -n "$FAILED_GATES" ]; then
+              echo "Quality gates failed for:$FAILED_GATES"
+              echo "All scores must be 95 or higher to pass quality gates"
+              exit 1
+            else
+              echo "All Lighthouse quality gates passed!"
+            fi
+          else
+            echo "Lighthouse results not found"
+            exit 1
+          fi
+
+      - name: Performance Budget Check
+        run: |
+          if [ -f ".lighthouseci/lhr-0.json" ]; then
+            # Check Core Web Vitals
+            FCP=$(jq '.audits["first-contentful-paint"].numericValue' .lighthouseci/lhr-0.json)
+            LCP=$(jq '.audits["largest-contentful-paint"].numericValue' .lighthouseci/lhr-0.json)
+            CLS=$(jq '.audits["cumulative-layout-shift"].numericValue' .lighthouseci/lhr-0.json)
+            TBT=$(jq '.audits["total-blocking-time"].numericValue' .lighthouseci/lhr-0.json)
+            
+            echo "Core Web Vitals:"
+            echo "FCP: ${FCP}ms (budget: 1500ms)"
+            echo "LCP: ${LCP}ms (budget: 2500ms)"
+            echo "CLS: $CLS (budget: 0.1)"
+            echo "TBT: ${TBT}ms (budget: 300ms)"
+            
+            # Check performance budgets
+            BUDGET_VIOLATIONS=""
+            
+            if (( $(echo "$FCP > 1500" | bc -l) )); then
+              BUDGET_VIOLATIONS="$BUDGET_VIOLATIONS FCP"
+            fi
+            
+            if (( $(echo "$LCP > 2500" | bc -l) )); then
+              BUDGET_VIOLATIONS="$BUDGET_VIOLATIONS LCP"
+            fi
+            
+            if (( $(echo "$CLS > 0.1" | bc -l) )); then
+              BUDGET_VIOLATIONS="$BUDGET_VIOLATIONS CLS"
+            fi
+            
+            if (( $(echo "$TBT > 300" | bc -l) )); then
+              BUDGET_VIOLATIONS="$BUDGET_VIOLATIONS TBT"
+            fi
+            
+            if [ -n "$BUDGET_VIOLATIONS" ]; then
+              echo "Performance budget violations:$BUDGET_VIOLATIONS"
+              echo "::warning::Performance budget exceeded for:$BUDGET_VIOLATIONS"
+            else
+              echo "All performance budgets met!"
+            fi
+          fi
+
+      - name: Generate Performance Report
+        if: always()
+        run: |
+          echo "# Lighthouse Performance Report" > lighthouse-summary.md
+          echo "" >> lighthouse-summary.md
+          echo "Generated on: $(date)" >> lighthouse-summary.md
+          echo "" >> lighthouse-summary.md
+          
+          if [ -f ".lighthouseci/lhr-0.json" ]; then
+            echo "## Scores" >> lighthouse-summary.md
+            echo "| Category | Score | Status |" >> lighthouse-summary.md
+            echo "|----------|-------|--------|" >> lighthouse-summary.md
+            
+            PERFORMANCE_SCORE=$(jq '.categories.performance.score' .lighthouseci/lhr-0.json)
+            ACCESSIBILITY_SCORE=$(jq '.categories.accessibility.score' .lighthouseci/lhr-0.json)
+            BEST_PRACTICES_SCORE=$(jq '.categories["best-practices"].score' .lighthouseci/lhr-0.json)
+            SEO_SCORE=$(jq '.categories.seo.score' .lighthouseci/lhr-0.json)
+            PWA_SCORE=$(jq '.categories.pwa.score' .lighthouseci/lhr-0.json)
+            
+            echo "| Performance | $(echo "$PERFORMANCE_SCORE * 100" | bc | cut -d. -f1) | $([ $(echo "$PERFORMANCE_SCORE >= 0.95" | bc) -eq 1 ] && echo "✅" || echo "❌") |" >> lighthouse-summary.md
+            echo "| Accessibility | $(echo "$ACCESSIBILITY_SCORE * 100" | bc | cut -d. -f1) | $([ $(echo "$ACCESSIBILITY_SCORE >= 0.95" | bc) -eq 1 ] && echo "✅" || echo "❌") |" >> lighthouse-summary.md
+            echo "| Best Practices | $(echo "$BEST_PRACTICES_SCORE * 100" | bc | cut -d. -f1) | $([ $(echo "$BEST_PRACTICES_SCORE >= 0.95" | bc) -eq 1 ] && echo "✅" || echo "❌") |" >> lighthouse-summary.md
+            echo "| SEO | $(echo "$SEO_SCORE * 100" | bc | cut -d. -f1) | $([ $(echo "$SEO_SCORE >= 0.95" | bc) -eq 1 ] && echo "✅" || echo "❌") |" >> lighthouse-summary.md
+            echo "| PWA | $(echo "$PWA_SCORE * 100" | bc | cut -d. -f1) | $([ $(echo "$PWA_SCORE >= 0.90" | bc) -eq 1 ] && echo "✅" || echo "❌") |" >> lighthouse-summary.md
+          fi
+
+      - name: Upload Performance Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-performance-report
+          path: lighthouse-summary.md
+          retention-days: 30

@@ -21,13 +21,14 @@ export default function Projects() {
     : projects.filter(p => p.category === selectedCategory)
 
   return (
-    <section id="projects" className="section bg-surface" aria-labelledby="projects-heading">
+    <section id="projects" className="section bg-surface content-auto" aria-labelledby="projects-heading">
       <div className="container">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
+          className="layout-stable"
         >
           <h2 id="projects-heading" className="text-4xl font-bold text-text-primary text-center mb-12">
             Projects

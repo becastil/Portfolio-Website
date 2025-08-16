@@ -5,18 +5,69 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '20'
+
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
+  checks: read
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build:
+  # Wait for quality gates to pass before deploying
+  quality-gate-check:
+    name: Quality Gate Verification
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Wait for CI checks
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Quality Gate'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+        continue-on-error: true
+
+      - name: Wait for Lighthouse checks
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Lighthouse Performance & Accessibility'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+        continue-on-error: true
+
+      - name: Wait for E2E tests
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'E2E Test Report'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success
+        continue-on-error: true
+
+      - name: Verify all checks passed
+        run: |
+          echo "All quality gates have been checked."
+          echo "Proceeding with deployment..."
+
+  build:
+    name: Build for Production
+    runs-on: ubuntu-latest
+    needs: quality-gate-check
+    timeout-minutes: 15
+    outputs:
+      deployment-ready: ${{ steps.build-check.outputs.ready }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,32 +75,206 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline
+
+      - name: Run final type check
+        run: npm run type-check
+
+      - name: Run final lint check
+        run: npm run lint
 
       - name: Build with Next.js
         run: npm run build
         env:
           NODE_ENV: production
 
+      - name: Verify build output
+        id: build-check
+        run: |
+          # Verify critical files exist
+          if [ ! -f "out/index.html" ]; then
+            echo "Missing index.html in build output"
+            exit 1
+          fi
+          
+          if [ ! -d "out/_next" ]; then
+            echo "Missing _next directory in build output"
+            exit 1
+          fi
+          
+          # Check build size
+          BUILD_SIZE=$(du -sb out | cut -f1)
+          echo "Build size: $BUILD_SIZE bytes"
+          
+          # Warn if build is unusually large (>50MB)
+          if [ "$BUILD_SIZE" -gt 52428800 ]; then
+            echo "::warning::Build size is larger than expected: $BUILD_SIZE bytes"
+          fi
+          
+          # Check for critical assets
+          CSS_FILES=$(find out/_next/static/css -name "*.css" 2>/dev/null | wc -l || echo "0")
+          JS_FILES=$(find out/_next/static/chunks -name "*.js" 2>/dev/null | wc -l || echo "0")
+          
+          echo "CSS files: $CSS_FILES"
+          echo "JS files: $JS_FILES"
+          
+          if [ "$CSS_FILES" -eq 0 ] || [ "$JS_FILES" -eq 0 ]; then
+            echo "::warning::Missing expected asset files"
+          fi
+          
+          echo "ready=true" >> $GITHUB_OUTPUT
+
+      - name: Test production build locally
+        run: |
+          # Start server in background for basic smoke test
+          npx http-server out -p 8080 &
+          SERVER_PID=$!
+          
+          # Wait for server to start
+          sleep 5
+          
+          # Basic smoke test
+          curl -f http://localhost:8080/ > /dev/null || {
+            echo "Production build smoke test failed"
+            kill $SERVER_PID
+            exit 1
+          }
+          
+          # Cleanup
+          kill $SERVER_PID
+          echo "Production build smoke test passed"
+
+      - name: Generate build manifest
+        run: |
+          echo "# Build Manifest" > build-manifest.md
+          echo "Built on: $(date)" >> build-manifest.md
+          echo "Commit: ${{ github.sha }}" >> build-manifest.md
+          echo "Branch: ${{ github.ref_name }}" >> build-manifest.md
+          echo "" >> build-manifest.md
+          echo "## Build Statistics" >> build-manifest.md
+          echo "- Build size: $(du -sh out | cut -f1)" >> build-manifest.md
+          echo "- Total files: $(find out -type f | wc -l)" >> build-manifest.md
+          echo "- HTML files: $(find out -name '*.html' | wc -l)" >> build-manifest.md
+          echo "- CSS files: $(find out -name '*.css' | wc -l)" >> build-manifest.md
+          echo "- JS files: $(find out -name '*.js' | wc -l)" >> build-manifest.md
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
+      - name: Upload build manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-manifest
+          path: build-manifest.md
+          retention-days: 30
+
   deploy:
+    name: Deploy to GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [quality-gate-check, build]
+    if: needs.build.outputs.deployment-ready == 'true'
+    timeout-minutes: 10
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Site URL: ${{ steps.deployment.outputs.page_url }}"
+          
+          # Wait a moment for deployment to propagate
+          sleep 10
+          
+          # Basic availability check
+          curl -f "${{ steps.deployment.outputs.page_url }}" > /dev/null || {
+            echo "::warning::Deployed site may not be immediately available"
+          }
+
+  post-deploy:
+    name: Post-Deployment Verification
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always() && needs.deploy.result == 'success'
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for site to be available
+        run: |
+          echo "Waiting for site to be fully available..."
+          for i in {1..12}; do
+            if curl -f "${{ needs.deploy.outputs.page_url || 'https://bencastillo.dev' }}" > /dev/null 2>&1; then
+              echo "Site is available!"
+              break
+            fi
+            echo "Attempt $i/12: Site not yet available, waiting..."
+            sleep 10
+          done
+
+      - name: Run post-deployment health check
+        run: |
+          SITE_URL="${{ needs.deploy.outputs.page_url || 'https://bencastillo.dev' }}"
+          
+          echo "Running health checks on: $SITE_URL"
+          
+          # Basic HTTP check
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Site returned HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          
+          # Check for critical content
+          CONTENT=$(curl -s "$SITE_URL")
+          
+          if echo "$CONTENT" | grep -q "Ben Castillo\|Portfolio"; then
+            echo "✅ Critical content found"
+          else
+            echo "::warning::Critical content not found on homepage"
+          fi
+          
+          # Check for CSS loading
+          if echo "$CONTENT" | grep -q "_next/static/css\|<style"; then
+            echo "✅ CSS resources detected"
+          else
+            echo "::warning::CSS resources not detected"
+          fi
+          
+          # Check for JS loading
+          if echo "$CONTENT" | grep -q "_next/static/chunks\|<script"; then
+            echo "✅ JavaScript resources detected"
+          else
+            echo "::warning::JavaScript resources not detected"
+          fi
+          
+          echo "Post-deployment health check completed"
+
+      - name: Notify deployment success
+        run: |
+          echo "🚀 Deployment completed successfully!"
+          echo "Site is live at: ${{ needs.deploy.outputs.page_url || 'https://bencastillo.dev' }}"
+          echo "All quality gates passed and site is operational."

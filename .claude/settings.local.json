@@ -14,7 +14,8 @@
       "Bash(npm run lint:*)",
       "Bash(npx eslint:*)",
       "Bash(node test-eslint.js)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

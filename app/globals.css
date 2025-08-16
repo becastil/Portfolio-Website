@@ -5,6 +5,29 @@
 /* Import existing design tokens */
 @import url('/tokens.css');
 
+/* CSS containment for performance */
+@layer utilities {
+  .contain-layout {
+    contain: layout;
+  }
+  
+  .contain-style {
+    contain: style;
+  }
+  
+  .contain-paint {
+    contain: paint;
+  }
+  
+  .contain-size {
+    contain: size;
+  }
+  
+  .contain-strict {
+    contain: strict;
+  }
+}
+
 /* Base layer overrides */
 @layer base {
   html {
@@ -118,6 +141,31 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+  }
+
+  /* Performance optimizations */
+  .content-auto {
+    content-visibility: auto;
+  }
+  
+  .content-hidden {
+    content-visibility: hidden;
+  }
+  
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  
+  /* Layout optimization */
+  .layout-stable {
+    contain: layout style;
+  }
+  
+  /* Render optimization */
+  .render-optimized {
+    will-change: auto;
+    transform: translateZ(0);
   }
 }
 
