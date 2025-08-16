@@ -12,24 +12,18 @@ import {
   createStructuredDataScript
 } from '@/lib/seo'
 
-interface BlogPageProps {
-  searchParams: {
-    page?: string
-  }
-}
+// Force static generation for blog page
+export const dynamic = 'force-static'
 
-export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
-  const currentPage = Number(searchParams.page) || 1
-  const pageTitle = currentPage > 1 
-    ? `Blog - Page ${currentPage} | ${siteMetadata.title}`
-    : `Blog | ${siteMetadata.title}`
+export async function generateMetadata(): Promise<Metadata> {
+  const pageTitle = `Blog | ${siteMetadata.title}`
   
   const description = 'Thoughts on web development, design, and technology trends. Explore tutorials, insights, and best practices for modern web development.'
   
   const openGraph = generateOpenGraphMetadata(
     pageTitle,
     description,
-    currentPage > 1 ? `/blog?page=${currentPage}` : '/blog'
+    '/blog'
   )
 
   const twitter = generateTwitterMetadata(pageTitle, description)
@@ -52,9 +46,7 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
       },
     },
     alternates: {
-      canonical: currentPage > 1 
-        ? `${siteMetadata.siteUrl}/blog?page=${currentPage}`
-        : `${siteMetadata.siteUrl}/blog`,
+      canonical: `${siteMetadata.siteUrl}/blog`,
       types: {
         'application/rss+xml': [
           {
@@ -67,8 +59,8 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   }
 }
 
-export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const currentPage = Number(searchParams.page) || 1
+export default async function BlogPage() {
+  const currentPage = 1 // Static generation always starts with page 1
   const pageSize = 9
   
   const [paginatedData, categories, tags] = await Promise.all([
