@@ -39,7 +39,7 @@ export default function RelatedPosts({ posts }: RelatedPostsProps) {
         className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
       >
         {posts.map((post) => (
-          <RelatedPostCard key={post._id} post={post} />
+          <RelatedPostCard key={post.slug} post={post} />
         ))}
       </StaggerContainer>
     </div>
