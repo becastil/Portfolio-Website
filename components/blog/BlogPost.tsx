@@ -10,9 +10,6 @@ import {
   Tag, 
   ArrowLeft, 
   Share2, 
-  Twitter, 
-  Linkedin, 
-  Facebook,
   Link as LinkIcon,
   ChevronUp,
   Star,
@@ -271,7 +268,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                     <h2 id="introduction" className="scroll-mt-24">Introduction to Framer Motion</h2>
                     <p>
                       Framer Motion is a production-ready motion library for React that brings your components to life with smooth, 
-                      performant animations. In this comprehensive guide, we'll explore how to leverage its powerful features to 
+                      performant animations. In this comprehensive guide, we&apos;ll explore how to leverage its powerful features to 
                       create engaging user experiences that enhance rather than distract from your content.
                     </p>
                   </FadeIn>
@@ -279,7 +276,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                   <SlideIn direction="right" delay={0.2}>
                     <h2 id="installation" className="scroll-mt-24">Installation and Setup</h2>
                     <p>
-                      Getting started with Framer Motion is straightforward. Let's walk through the installation process and 
+                      Getting started with Framer Motion is straightforward. Let&apos;s walk through the installation process and 
                       basic configuration to get you up and running quickly.
                     </p>
                     <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">
@@ -296,7 +293,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                     
                     <h3 id="layout-animations" className="scroll-mt-24">Layout Animations</h3>
                     <p>
-                      One of Framer Motion's most powerful features is its ability to automatically animate between layouts. 
+                      One of Framer Motion&apos;s most powerful features is its ability to automatically animate between layouts. 
                       This creates smooth transitions when elements change size, position, or structure.
                     </p>
 
@@ -311,7 +308,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                     <h2 id="performance" className="scroll-mt-24">Performance Considerations</h2>
                     <p>
                       While animations can greatly enhance user experience, they must be implemented thoughtfully to avoid 
-                      performance issues. We'll cover optimization techniques and best practices for smooth 60fps animations.
+                      performance issues. We&apos;ll cover optimization techniques and best practices for smooth 60fps animations.
                     </p>
                   </SlideIn>
 
@@ -319,7 +316,7 @@ export default function BlogPost({ post }: BlogPostProps) {
                     <h2 id="conclusion" className="scroll-mt-24">Conclusion</h2>
                     <p>
                       Framer Motion opens up a world of possibilities for creating engaging, interactive web experiences. 
-                      By following the principles and techniques outlined in this guide, you'll be well-equipped to add 
+                      By following the principles and techniques outlined in this guide, you&apos;ll be well-equipped to add 
                       meaningful animations to your React applications.
                     </p>
                   </FadeIn>

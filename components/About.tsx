@@ -18,13 +18,13 @@ export default function About() {
           </h2>
           <div className="space-y-6">
             <p className="text-lg text-text-secondary leading-relaxed">
-              I'm a full-stack developer with a passion for building scalable web applications 
+              I&apos;m a full-stack developer with a passion for building scalable web applications 
               and exploring emerging technologies. My journey spans from crafting pixel-perfect 
               user interfaces to architecting robust backend systems.
             </p>
             <p className="text-lg text-text-secondary leading-relaxed">
               I believe in writing clean, maintainable code and creating solutions that make 
-              a real impact. Whether it's optimizing performance, improving user experience, 
+              a real impact. Whether it&apos;s optimizing performance, improving user experience, 
               or solving complex technical challenges, I approach each project with curiosity 
               and dedication.
             </p>

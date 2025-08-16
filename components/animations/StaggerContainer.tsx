@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useInView, Variants } from 'framer-motion'
-import { useRef, ReactNode, Children, cloneElement, isValidElement } from 'react'
+import { useRef, ReactNode, Children, isValidElement } from 'react'
 
 interface StaggerContainerProps {
   children: ReactNode

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Search, Filter, Calendar, Clock, Tag, ArrowRight } from 'lucide-react'
+import { Search, Filter, ArrowRight } from 'lucide-react'
 import { 
   TextReveal, 
   FadeIn, 

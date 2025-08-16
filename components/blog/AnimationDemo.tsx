@@ -5,8 +5,6 @@ import { motion } from 'framer-motion'
 import { 
   Play, 
   Pause, 
-  RotateCcw, 
-  Settings,
   Zap,
   Eye,
   MousePointer,
@@ -20,7 +18,6 @@ import {
   TextReveal,
   StaggerContainer,
   ParallaxWrapper,
-  OptimizedMotion,
   OptimizedFadeIn,
   OptimizedSlideUp,
   OptimizedScale

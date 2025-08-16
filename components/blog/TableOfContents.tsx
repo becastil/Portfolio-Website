@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { List, ChevronRight } from 'lucide-react'
-import { FadeIn, SlideIn } from '@/components/animations'
+import { FadeIn } from '@/components/animations'
 
 interface Heading {
   id: string
