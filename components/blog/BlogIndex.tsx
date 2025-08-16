@@ -193,7 +193,7 @@ export default function BlogIndex({ initialPosts, categories, tags }: BlogIndexP
           className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
           {regularPosts.map((post) => (
-            <BlogCard key={post._id} post={post} />
+            <BlogCard key={post.slug} post={post} />
           ))}
         </StaggerContainer>
       ) : (
