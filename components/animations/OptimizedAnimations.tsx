@@ -22,7 +22,7 @@ export function OptimizedMotion({
   ...props
 }: OptimizedMotionProps) {
   const shouldReduceMotion = useReducedMotion()
-  const { isLowPerformance, getOptimizedAnimationSettings } = usePerformanceMonitor()
+  const { getOptimizedAnimationSettings } = usePerformanceMonitor()
 
   const optimizedProps = useMemo(() => {
     const settings = getOptimizedAnimationSettings()
