@@ -78,20 +78,39 @@
             const theme = this.themes[themeName];
             if (!theme) return;
             
-            // Get the root element to update CSS variables
+            // Get the root element to update CSS variables and set data-theme attribute
             const root = document.documentElement;
+            root.setAttribute('data-theme', themeName);
             
             // Apply each CSS custom property
             Object.entries(theme).forEach(([property, value]) => {
                 root.style.setProperty(property, value);
             });
             
-            // Update button icon and ARIA attributes for accessibility - WCAG 4.1.2
+            // Update button content with SVG icons and ARIA attributes for accessibility - WCAG 4.1.2
             if (elements.themeToggle) {
-                elements.themeToggle.textContent = themeName === 'dark' ? '☀️' : '🌙';
-                elements.themeToggle.setAttribute('aria-label', 
-                    `Switch to ${themeName === 'dark' ? 'light' : 'dark'} mode`);
-                elements.themeToggle.setAttribute('aria-pressed', themeName === 'dark' ? 'true' : 'false');
+                // Create SVG icon and text based on current theme
+                const isDark = themeName === 'dark';
+                const nextTheme = isDark ? 'light' : 'dark';
+                const iconSVG = isDark ? 
+                    // Sun icon for switching to light mode
+                    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>` :
+                    // Moon icon for switching to dark mode
+                    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>`;
+                
+                const buttonText = isDark ? 'Light' : 'Dark';
+                
+                // Update button innerHTML with icon and text
+                elements.themeToggle.innerHTML = `${iconSVG}<span>${buttonText}</span>`;
+                
+                // Update accessibility attributes
+                elements.themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+                elements.themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             }
             
             // Save preference to localStorage for persistence

@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import existing design tokens */
+@import url('/tokens.css');
+
+/* Base layer overrides */
+@layer base {
+  html {
+    @apply scroll-smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply text-text-primary bg-background;
+    font-family: var(--font-family-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
+
+  /* Typography defaults */
+  h1 { @apply text-5xl font-bold; }
+  h2 { @apply text-4xl font-bold; }
+  h3 { @apply text-3xl font-bold; }
+  h4 { @apply text-2xl font-bold; }
+  h5 { @apply text-xl font-semibold; }
+  h6 { @apply text-lg font-semibold; }
+
+  p {
+    @apply text-text-secondary leading-relaxed;
+    max-width: 65ch;
+  }
+
+  /* Focus visible styles */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-focus;
+  }
+}
+
+/* Component layer */
+@layer components {
+  /* Container component */
+  .container {
+    @apply max-w-[1200px] mx-auto px-4 md:px-8 lg:px-12;
+  }
+
+  /* Section spacing */
+  .section {
+    @apply py-20 md:py-24 lg:py-28;
+  }
+
+  /* Button base styles */
+  .btn {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply hover:translate-y-[-1px] hover:shadow-md;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+    min-height: 44px;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-accent-hover;
+  }
+
+  .btn-secondary {
+    @apply btn border-2 border-accent text-accent-text hover:bg-accent hover:text-white;
+  }
+
+  /* Form elements */
+  .form-input {
+    @apply w-full px-4 py-3 border border-border rounded-lg bg-surface;
+    @apply text-text-primary transition-all duration-300;
+    @apply focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10;
+    min-height: 44px;
+  }
+
+  .form-label {
+    @apply block font-medium text-text-primary mb-2;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-surface border border-border rounded-lg p-8;
+    @apply transition-all duration-300 hover:shadow-md;
+  }
+
+  /* Tech tag */
+  .tech-tag {
+    @apply text-sm px-3 py-2 bg-surface-hover text-text-secondary;
+    @apply rounded-md font-medium;
+  }
+}
+
+/* Utility layer extensions */
+@layer utilities {
+  /* Screen reader only */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Touch target optimization */
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px] flex items-center justify-center;
+  }
+
+  /* Text balance for better readability */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Prevent text selection */
+  .select-disabled {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+}
+
+/* Animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text-secondary: var(--color-text-primary);
+  }
+  
+  [data-theme="dark"] {
+    --color-border: #ffffff;
+  }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  @apply absolute top-0 left-0 bg-accent text-white px-4 py-2 z-50;
+  @apply -translate-y-full focus:translate-y-0 transition-transform;
+}

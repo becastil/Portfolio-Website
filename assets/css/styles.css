@@ -1,40 +1,45 @@
 /*
 ==================================================
-MINIMALIST PORTFOLIO CSS SYSTEM
-Inspired by williamlin.io - Clean, accessible, performant
+ANTHROPIC-INSPIRED PORTFOLIO CSS SYSTEM
+Clean, modern aesthetic with generous spacing
 ==================================================
 */
 
 /* 
 CSS Custom Properties (Design Tokens)
-These variables create a consistent design system that's easy to maintain
+These variables create a consistent design system matching Anthropic's aesthetic
 */
 :root {
-  /* Color System - Light Theme */
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
-  --color-background: #ffffff;
-  --color-background-subtle: #f9fafb;
-  --color-border: #e5e7eb;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f3f4f6;
+  /* Color System - Light Theme (Anthropic Design Tokens) */
+  --color-text-primary: #000000;
+  --color-text-secondary: #666666;
+  --color-text-muted: #666666;
+  --color-background: #FFFFFF;
+  --color-background-subtle: #F8F8F8;
+  --color-border: #E5E5E5;
+  --color-accent: #CC7A5C;
+  --color-accent-hover: #D88A6C;
+  --color-accent-text: #CC7A5C;
+  --color-accent-focus: #B66A4C;
+  --color-surface: #F8F8F8;
+  --color-surface-hover: #F0F0F0;
+  --color-neutral-warm: #D4C7B8;
+  --color-error: #DC2626;
+  --color-success: #059669;
   
-  /* Typography Scale - Modular scale based on 1.25 ratio */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
-  --font-size-5xl: 3rem;      /* 48px */
+  /* Typography Scale - Anthropic scale with larger sizes */
+  --font-size-xs: 0.875rem;   /* 14px */
+  --font-size-sm: 1rem;       /* 16px */
+  --font-size-base: 1.125rem; /* 18px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 1.875rem;  /* 30px */
+  --font-size-3xl: 2.25rem;   /* 36px */
+  --font-size-4xl: 2.75rem;   /* 44px */
+  --font-size-5xl: 3.5rem;    /* 56px */
   
-  /* Font families - System fonts for performance */
-  --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Font families - Inter font for Anthropic aesthetic */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   
   /* Font weights */
@@ -43,12 +48,12 @@ These variables create a consistent design system that's easy to maintain
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   
-  /* Line heights - Optimized for readability */
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  /* Line heights - Anthropic generous spacing */
+  --line-height-tight: 1.4;
+  --line-height-normal: 1.75;
+  --line-height-relaxed: 1.8;
   
-  /* Spacing Scale - Based on 4px base unit */
+  /* Spacing Scale - Anthropic generous spacing */
   --space-1: 0.25rem;   /* 4px */
   --space-2: 0.5rem;    /* 8px */
   --space-3: 0.75rem;   /* 12px */
@@ -61,6 +66,8 @@ These variables create a consistent design system that's easy to maintain
   --space-16: 4rem;     /* 64px */
   --space-20: 5rem;     /* 80px */
   --space-24: 6rem;     /* 96px */
+  --space-28: 7rem;     /* 112px */
+  --space-32: 7.5rem;   /* 120px */
   
   /* Container and breakpoint system */
   --container-max-width: 1200px;
@@ -70,35 +77,40 @@ These variables create a consistent design system that's easy to maintain
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   
-  /* Border radius scale */
-  --radius-sm: 0.125rem;   /* 2px */
-  --radius-md: 0.375rem;   /* 6px */
-  --radius-lg: 0.5rem;     /* 8px */
-  --radius-xl: 0.75rem;    /* 12px */
+  /* Border radius scale - Anthropic style (larger radii) */
+  --radius-sm: 0.5rem;     /* 8px */
+  --radius-md: 0.75rem;    /* 12px */
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.25rem;    /* 20px */
   
-  /* Shadow system */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Shadow system - Anthropic subtle shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
   
   /* Transition timing */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  --transition-fast: 200ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
 }
 
-/* Dark theme variables */
+/* Dark theme variables - Anthropic aesthetic */
 [data-theme="dark"] {
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #d1d5db;
-  --color-text-muted: #9ca3af;
-  --color-background: #111827;
-  --color-background-subtle: #1f2937;
-  --color-border: #374151;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-surface: #1f2937;
-  --color-surface-hover: #374151;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #CCCCCC;
+  --color-text-muted: #999999;
+  --color-background: #0D0D0D;
+  --color-background-subtle: #1A1A1A;
+  --color-border: #333333;
+  --color-accent: #CC7A5C;
+  --color-accent-hover: #D88A6C;
+  --color-accent-text: #E69B7B;
+  --color-accent-focus: #F0B59B;
+  --color-surface: #1A1A1A;
+  --color-surface-hover: #2A2A2A;
+  --color-neutral-warm: #4A453F;
+  --color-error: #EF4444;
+  --color-success: #10B981;
 }
 
 /*
@@ -228,11 +240,11 @@ Reusable layout patterns
 }
 
 .section {
-  padding: var(--space-20) 0;
+  padding: var(--space-28) 0;
 }
 
 .section--large {
-  padding: var(--space-24) 0;
+  padding: var(--space-32) 0;
 }
 
 /* Flexbox utilities */
@@ -300,32 +312,16 @@ Sticky header with clean minimal design
 .nav__link {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  transition: color var(--transition-fast);
-  position: relative;
-  padding: var(--space-2) 0;
+  transition: all var(--transition-normal);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
 }
 
 .nav__link:hover,
 .nav__link:focus {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
+  background-color: var(--color-surface-hover);
   outline: none;
-}
-
-/* Subtle underline effect on hover */
-.nav__link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--color-accent);
-  transition: width var(--transition-normal);
-}
-
-.nav__link:hover::after,
-.nav__link:focus::after {
-  width: 100%;
 }
 
 /*
@@ -336,9 +332,9 @@ Impactful introduction without overwhelming design
 */
 
 .hero {
-  padding: var(--space-24) 0;
+  padding: var(--space-32) 0;
   text-align: center;
-  background-color: var(--color-background-subtle);
+  background-color: var(--color-background);
 }
 
 .hero__title {
@@ -362,13 +358,15 @@ Impactful introduction without overwhelming design
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-5) var(--space-10);
   background-color: var(--color-accent);
-  color: white;
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-md);
+  color: #FFFFFF;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-xl);
   transition: all var(--transition-normal);
   box-shadow: var(--shadow-sm);
+  border: none;
+  font-size: var(--font-size-lg);
 }
 
 .hero__cta:hover,
@@ -387,7 +385,7 @@ Responsive grid with clean card design
 */
 
 .projects {
-  padding: var(--space-20) 0;
+  padding: var(--space-28) 0;
 }
 
 .projects__grid {
@@ -402,15 +400,16 @@ Responsive grid with clean card design
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--space-8);
   transition: all var(--transition-normal);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
 .project-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border);
 }
 
 .project-card__title {
@@ -435,11 +434,12 @@ Responsive grid with clean card design
 
 .tech-tag {
   font-size: var(--font-size-sm);
-  padding: var(--space-1) var(--space-3);
-  background-color: var(--color-background-subtle);
-  color: var(--color-text-muted);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  border: none;
+  font-weight: var(--font-weight-medium);
 }
 
 .project-card__links {
@@ -450,8 +450,10 @@ Responsive grid with clean card design
 .project-link {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   transition: color var(--transition-fast);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .project-link:hover,
@@ -462,14 +464,65 @@ Responsive grid with clean card design
 
 /*
 ==================================================
+PROJECT FILTER BUTTONS
+Modern button styling with proper accessibility
+==================================================
+*/
+
+.filter-btn {
+  margin: 0 var(--space-2) var(--space-2) 0;
+  padding: var(--space-3) var(--space-6);
+  border: 2px solid var(--color-accent);
+  background: var(--color-background);
+  color: var(--color-accent-text);
+  border-radius: var(--radius-xl);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-btn[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: #FFFFFF;
+}
+
+.filter-btn:hover {
+  background: var(--color-accent);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.filter-btn:focus {
+  outline: none;
+}
+
+.filter-btn:focus-visible {
+  outline: 2px solid var(--color-accent-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+}
+
+.filter-btn:active {
+  transform: translateY(0);
+}
+
+/*
+==================================================
 ABOUT SECTION
 Readable content with optimal line length
 ==================================================
 */
 
 .about {
-  padding: var(--space-20) 0;
-  background-color: var(--color-background-subtle);
+  padding: var(--space-28) 0;
+  background-color: var(--color-background);
 }
 
 .about__content {
@@ -492,7 +545,7 @@ Modern form styling with excellent UX
 */
 
 .contact {
-  padding: var(--space-20) 0;
+  padding: var(--space-28) 0;
 }
 
 .contact__form {
@@ -514,12 +567,12 @@ Modern form styling with excellent UX
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-4);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background-color: var(--color-surface);
   color: var(--color-text-primary);
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   font-size: var(--font-size-base);
 }
 
@@ -527,7 +580,7 @@ Modern form styling with excellent UX
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 .form-textarea {
@@ -537,13 +590,16 @@ Modern form styling with excellent UX
 
 .form-button {
   width: 100%;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-5) var(--space-6);
   background-color: var(--color-accent);
-  color: white;
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-md);
+  color: #FFFFFF;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-xl);
   transition: all var(--transition-normal);
   cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-lg);
 }
 
 .form-button:hover,
@@ -566,9 +622,9 @@ Minimal footer with essential information
 */
 
 .footer {
-  padding: var(--space-16) 0;
+  padding: var(--space-20) 0;
   border-top: 1px solid var(--color-border);
-  background-color: var(--color-background-subtle);
+  background-color: var(--color-background);
 }
 
 .footer__content {
@@ -595,7 +651,7 @@ Minimal footer with essential information
 
 .footer__link:hover,
 .footer__link:focus {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   outline: none;
 }
 
@@ -613,16 +669,39 @@ Mobile-first approach with logical breakpoints
   }
   
   .nav__links {
-    gap: var(--space-10);
+    gap: var(--space-8);
+  }
+  
+  .nav__link {
+    min-height: auto;
+    padding: var(--space-2) var(--space-4);
   }
   
   /* 2-column grid for tablets */
   .projects__grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
   }
   
   .hero__title {
     font-size: var(--font-size-5xl);
+  }
+  
+  .section {
+    padding: var(--space-20) 0;
+  }
+  
+  .hero {
+    padding: var(--space-24) 0;
+  }
+  
+  .theme-toggle-text {
+    display: inline;
+  }
+  
+  .footer__links {
+    flex-direction: row;
+    gap: var(--space-6);
   }
 }
 
@@ -631,14 +710,24 @@ Mobile-first approach with logical breakpoints
   /* 3-column grid for desktop */
   .projects__grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
   }
   
   .section {
-    padding: var(--space-24) 0;
+    padding: var(--space-28) 0;
   }
   
   .hero {
-    padding: var(--space-24) 0 var(--space-20);
+    padding: var(--space-32) 0 var(--space-28);
+  }
+  
+  .nav__links {
+    gap: var(--space-10);
+  }
+  
+  .filter-btn {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-sm);
   }
 }
 
@@ -649,16 +738,78 @@ Mobile-first approach with logical breakpoints
   }
 }
 
-/* Mobile navigation adjustments */
-@media (max-width: 767px) {
-  .nav {
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-4) 0;
+/* Small mobile devices: 320px to 374px */
+@media (max-width: 374px) {
+  .container {
+    padding: 0 var(--space-3);
+  }
+  
+  .hero__title {
+    font-size: var(--font-size-3xl);
+    line-height: 1.2;
+  }
+  
+  .hero__subtitle {
+    font-size: var(--font-size-base);
+  }
+  
+  .section {
+    padding: var(--space-8) 0;
+  }
+  
+  .hero {
+    padding: var(--space-12) 0;
+  }
+  
+  .nav__brand {
+    font-size: var(--font-size-lg);
   }
   
   .nav__links {
-    gap: var(--space-6);
+    gap: var(--space-2);
+  }
+  
+  .nav__link {
+    padding: var(--space-2);
+    font-size: var(--font-size-xs);
+  }
+  
+  .filter-btn {
+    margin: 0 var(--space-1) var(--space-2) 0;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .project-card {
+    padding: var(--space-4);
+  }
+  
+  .theme-toggle-btn {
+    padding: var(--space-2);
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Mobile devices: 375px to 767px */
+@media (min-width: 375px) and (max-width: 767px) {
+  .nav {
+    gap: var(--space-2);
+    padding: var(--space-3) 0;
+  }
+  
+  .nav__links {
+    gap: var(--space-3);
+  }
+  
+  .nav__link {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-sm);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
   
   .hero {
@@ -673,9 +824,82 @@ Mobile-first approach with logical breakpoints
     font-size: var(--font-size-lg);
   }
   
+  .section {
+    padding: var(--space-12) 0;
+  }
+  
   .footer__links {
-    flex-direction: column;
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+  
+  .footer__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    min-height: 44px;
+  }
+  
+  .container {
+    padding: 0 var(--space-4);
+  }
+  
+  .filter-btn {
+    margin: 0 var(--space-1) var(--space-2) 0;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-sm);
+    min-height: 44px;
+    min-width: auto;
+  }
+  
+  .theme-toggle-btn {
+    gap: var(--space-2);
+  }
+  
+  .theme-toggle-text {
+    display: none;
+  }
+}
+
+/* Legacy mobile support: all mobile devices */
+@media (max-width: 767px) {
+  .nav {
+    position: relative;
+  }
+  
+  .project-card__tech {
+    gap: var(--space-1);
+  }
+  
+  .tech-tag {
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+  }
+  
+  h2 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+  
+  .form-input,
+  .form-textarea {
+    font-size: var(--font-size-base);
+    padding: var(--space-4);
+    min-height: 44px;
+  }
+  
+  .form-button {
+    min-height: 48px;
+    font-size: var(--font-size-base);
+  }
+  
+  .about__text {
+    font-size: var(--font-size-base);
   }
 }
 
@@ -686,15 +910,16 @@ Focus states and screen reader support
 ==================================================
 */
 
-/* Enhanced focus visibility */
+/* Enhanced focus visibility with accessible contrast */
 .nav__link:focus-visible,
 .hero__cta:focus-visible,
 .project-link:focus-visible,
 .form-input:focus-visible,
 .form-textarea:focus-visible,
 .form-button:focus-visible,
-.footer__link:focus-visible {
-  outline: 2px solid var(--color-accent);
+.footer__link:focus-visible,
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--color-accent-focus);
   outline-offset: 2px;
 }
 
@@ -774,4 +999,129 @@ Common utilities for quick styling
 
 .mt-12 {
   margin-top: var(--space-12);
+}
+
+/* Additional Anthropic-inspired utilities */
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-md);
+}
+
+/*
+==================================================
+ERROR MESSAGE STYLING
+Accessible error states for form validation
+==================================================
+*/
+
+.error-message {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-2);
+  display: block;
+  font-weight: var(--font-weight-medium);
+}
+
+.form-input[aria-invalid="true"],
+.form-textarea[aria-invalid="true"] {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.success-message {
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-2);
+  display: block;
+  font-weight: var(--font-weight-medium);
+}
+
+/*
+==================================================
+THEME TOGGLE BUTTON
+Accessible dark mode toggle styling
+==================================================
+*/
+
+.theme-toggle-btn {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+.theme-toggle-btn[aria-pressed="true"] {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  border-color: var(--color-accent);
+}
+
+.bg-clean {
+  background-color: var(--color-surface);
+}
+
+/*
+==================================================
+RESPONSIVE UTILITIES
+Additional classes for responsive design control
+==================================================
+*/
+
+/* Touch target optimization */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive text sizing */
+@media (max-width: 767px) {
+  .responsive-text {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Prevent horizontal scroll on all devices */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure all interactive elements have proper touch targets */
+button, a, input, textarea, select {
+  min-height: 44px;
+}
+
+/* Responsive image containers */
+.image-container {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }

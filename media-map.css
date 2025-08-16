@@ -1,0 +1,224 @@
+/*
+==================================================
+MEDIA QUERY MAP
+Centralized responsive design breakpoint definitions
+==================================================
+*/
+
+/* 
+BREAKPOINT SYSTEM OVERVIEW
+- Mobile-first approach
+- Progressive enhancement
+- Touch-optimized design
+*/
+
+/* ==========================================================================
+   SMALL MOBILE DEVICES
+   Target: 320px - 374px (iPhone 5/SE, older Android phones)
+   ========================================================================== */
+
+@media (max-width: 374px) {
+  /* 
+  USAGE: Ultra-compact mobile optimization
+  - Minimal spacing and typography
+  - Essential content only
+  - Maximum space efficiency
+  
+  EXAMPLE:
+  .hero {
+    padding: var(--space-8) 0;
+    text-align: center;
+  }
+  
+  .hero__title {
+    font-size: var(--font-size-3xl);
+  }
+  */
+}
+
+/* ==========================================================================
+   MOBILE DEVICES
+   Target: 375px - 767px (Modern smartphones)
+   ========================================================================== */
+
+@media (min-width: 375px) and (max-width: 767px) {
+  /* 
+  USAGE: Standard mobile optimization
+  - Comfortable touch targets (44px minimum)
+  - Single-column layouts
+  - Readable typography
+  
+  EXAMPLE:
+  .nav__link {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .projects__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  */
+}
+
+/* ==========================================================================
+   TABLET DEVICES
+   Target: 768px - 1023px (iPad, Android tablets)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  /* 
+  USAGE: Two-column layouts and enhanced spacing
+  - 2-column grids for content
+  - Increased navigation spacing
+  - Moderate section padding
+  
+  EXAMPLE:
+  .projects__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+  
+  .section {
+    padding: var(--space-20) 0;
+  }
+  */
+}
+
+/* ==========================================================================
+   DESKTOP DEVICES
+   Target: 1024px - 1279px (Laptops, smaller desktops)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  /* 
+  USAGE: Three-column layouts and full spacing
+  - 3-column grids for content
+  - Full Anthropic generous spacing
+  - Enhanced interactive elements
+  
+  EXAMPLE:
+  .projects__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+  
+  .section {
+    padding: var(--space-28) 0;
+  }
+  */
+}
+
+/* ==========================================================================
+   LARGE DESKTOP DEVICES
+   Target: 1280px+ (Large monitors, wide screens)
+   ========================================================================== */
+
+@media (min-width: 1280px) {
+  /* 
+  USAGE: Maximum spacing and optimal reading experience
+  - Wide container padding
+  - Maximum section spacing
+  - Enhanced visual hierarchy
+  
+  EXAMPLE:
+  .container {
+    padding: 0 var(--space-12);
+  }
+  
+  .section {
+    padding: var(--space-32) 0;
+  }
+  */
+}
+
+/* ==========================================================================
+   ORIENTATION-BASED QUERIES
+   ========================================================================== */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  /* 
+  USAGE: Landscape mobile optimization
+  - Reduced vertical spacing
+  - Horizontal navigation emphasis
+  
+  EXAMPLE:
+  .hero {
+    padding: var(--space-8) 0;
+  }
+  */
+}
+
+/* ==========================================================================
+   HIGH-DPI DISPLAYS
+   ========================================================================== */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 
+  USAGE: Retina/high-DPI optimizations
+  - Enhanced image quality
+  - Sharper borders and shadows
+  
+  EXAMPLE:
+  .icon {
+    background-image: url('icon@2x.png');
+    background-size: 24px 24px;
+  }
+  */
+}
+
+/* ==========================================================================
+   ACCESSIBILITY-FOCUSED QUERIES
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  /* 
+  USAGE: Respect user motion preferences
+  - Disable animations and transitions
+  - Maintain functionality without motion
+  */
+}
+
+@media (prefers-contrast: high) {
+  /* 
+  USAGE: Enhanced contrast for accessibility
+  - Stronger borders and text contrast
+  - High-contrast color schemes
+  */
+}
+
+@media (prefers-color-scheme: dark) {
+  /* 
+  USAGE: System-level dark mode detection
+  - Automatic dark theme application
+  - Respects OS preferences
+  */
+}
+
+/* ==========================================================================
+   FUTURE: CONTAINER QUERIES (when supported)
+   ========================================================================== */
+
+/*
+@container (min-width: 300px) {
+  USAGE: Component-level responsive design
+  - Cards adapt based on container size
+  - More granular control than viewport queries
+  
+  EXAMPLE:
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card__content {
+    padding: var(--space-4);
+  }
+}
+
+@container (min-width: 500px) {
+  .card {
+    flex-direction: row;
+  }
+}
+*/

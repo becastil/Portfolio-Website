@@ -1,0 +1,676 @@
+{
+  "evaluation_rubrics": {
+    "overview": {
+      "title": "Ben Castillo Portfolio Website - QA Evaluation Rubrics",
+      "description": "Comprehensive scoring criteria for evaluating website quality across multiple dimensions",
+      "version": "1.0",
+      "last_updated": "2025-08-15",
+      "total_possible_score": 100,
+      "weighting_strategy": "Balanced approach prioritizing functionality and accessibility"
+    },
+    "scoring_system": {
+      "scale": {
+        "excellent": {
+          "score_range": "90-100",
+          "description": "Exceeds expectations, industry best practices",
+          "color": "#10b981"
+        },
+        "good": {
+          "score_range": "80-89",
+          "description": "Meets expectations with minor improvements needed",
+          "color": "#3b82f6"
+        },
+        "satisfactory": {
+          "score_range": "70-79",
+          "description": "Acceptable quality with notable improvements needed",
+          "color": "#f59e0b"
+        },
+        "needs_improvement": {
+          "score_range": "60-69",
+          "description": "Below expectations, significant issues present",
+          "color": "#ef4444"
+        },
+        "poor": {
+          "score_range": "0-59",
+          "description": "Unacceptable quality, major rework required",
+          "color": "#dc2626"
+        }
+      },
+      "methodology": "Each category is scored individually, then weighted to calculate final score"
+    },
+    "evaluation_categories": {
+      "functionality": {
+        "weight": 35,
+        "description": "Core features and interactive elements working correctly",
+        "subcategories": {
+          "navigation": {
+            "weight": 25,
+            "criteria": [
+              {
+                "item": "Smooth scroll navigation",
+                "points": 5,
+                "evaluation": "All navigation links smoothly scroll to sections within 800-1000ms"
+              },
+              {
+                "item": "Active state management",
+                "points": 5,
+                "evaluation": "Navigation highlights active section based on scroll position"
+              },
+              {
+                "item": "Logo functionality",
+                "points": 3,
+                "evaluation": "Logo click returns to top of page smoothly"
+              },
+              {
+                "item": "Skip link accessibility",
+                "points": 5,
+                "evaluation": "Skip link works and jumps to main content"
+              },
+              {
+                "item": "Cross-browser consistency",
+                "points": 7,
+                "evaluation": "Navigation works identically across Chrome, Firefox, Safari, Edge"
+              }
+            ]
+          },
+          "dark_mode": {
+            "weight": 20,
+            "criteria": [
+              {
+                "item": "Theme toggle functionality",
+                "points": 8,
+                "evaluation": "Theme toggle switches between light and dark modes instantly"
+              },
+              {
+                "item": "Persistence across sessions",
+                "points": 6,
+                "evaluation": "Theme preference saves to localStorage and persists on page reload"
+              },
+              {
+                "item": "Visual consistency",
+                "points": 4,
+                "evaluation": "All elements update colors appropriately in both themes"
+              },
+              {
+                "item": "Accessibility compliance",
+                "points": 2,
+                "evaluation": "aria-pressed and aria-label attributes update correctly"
+              }
+            ]
+          },
+          "project_filtering": {
+            "weight": 25,
+            "criteria": [
+              {
+                "item": "Filter functionality",
+                "points": 8,
+                "evaluation": "All filter buttons correctly show/hide projects by category"
+              },
+              {
+                "item": "Animation smoothness",
+                "points": 6,
+                "evaluation": "Fade transitions occur smoothly in 300ms without glitches"
+              },
+              {
+                "item": "Accessibility announcements",
+                "points": 5,
+                "evaluation": "Screen readers announce filter changes and project counts"
+              },
+              {
+                "item": "Rapid interaction handling",
+                "points": 3,
+                "evaluation": "Multiple rapid filter clicks handled gracefully"
+              },
+              {
+                "item": "Button state management",
+                "points": 3,
+                "evaluation": "aria-pressed states update correctly for filter buttons"
+              }
+            ]
+          },
+          "form_validation": {
+            "weight": 30,
+            "criteria": [
+              {
+                "item": "Required field validation",
+                "points": 8,
+                "evaluation": "Name, email, and message fields show appropriate required errors"
+              },
+              {
+                "item": "Email format validation",
+                "points": 6,
+                "evaluation": "Email field validates format and shows helpful error messages"
+              },
+              {
+                "item": "Real-time validation",
+                "points": 5,
+                "evaluation": "Validation occurs on blur and errors clear during input"
+              },
+              {
+                "item": "Success handling",
+                "points": 4,
+                "evaluation": "Form shows success message and resets after submission"
+              },
+              {
+                "item": "Error recovery",
+                "points": 4,
+                "evaluation": "Users can correct errors and successfully submit form"
+              },
+              {
+                "item": "Accessibility compliance",
+                "points": 3,
+                "evaluation": "Form labels, errors, and ARIA attributes work with screen readers"
+              }
+            ]
+          }
+        }
+      },
+      "accessibility": {
+        "weight": 25,
+        "description": "WCAG 2.2 AA compliance and inclusive design practices",
+        "subcategories": {
+          "keyboard_navigation": {
+            "weight": 30,
+            "criteria": [
+              {
+                "item": "Tab order logic",
+                "points": 8,
+                "evaluation": "Tab order follows visual layout and is logical throughout page"
+              },
+              {
+                "item": "Focus indicators",
+                "points": 7,
+                "evaluation": "All interactive elements have clear, visible focus indicators"
+              },
+              {
+                "item": "Keyboard activation",
+                "points": 7,
+                "evaluation": "All interactive elements respond to Enter and Space keys"
+              },
+              {
+                "item": "No keyboard traps",
+                "points": 5,
+                "evaluation": "Focus never gets trapped; users can navigate through entire page"
+              },
+              {
+                "item": "Skip link functionality",
+                "points": 3,
+                "evaluation": "Skip link is focusable and functional for keyboard users"
+              }
+            ]
+          },
+          "screen_reader_compatibility": {
+            "weight": 35,
+            "criteria": [
+              {
+                "item": "Semantic markup",
+                "points": 10,
+                "evaluation": "Proper use of headings, landmarks, and semantic HTML elements"
+              },
+              {
+                "item": "ARIA implementation",
+                "points": 8,
+                "evaluation": "ARIA labels, roles, and states correctly implemented"
+              },
+              {
+                "item": "Dynamic content announcements",
+                "points": 7,
+                "evaluation": "Filter changes and form feedback announced via live regions"
+              },
+              {
+                "item": "Form accessibility",
+                "points": 6,
+                "evaluation": "Form labels, errors, and requirements properly associated"
+              },
+              {
+                "item": "Alternative text",
+                "points": 4,
+                "evaluation": "All functional images and icons have appropriate alt text"
+              }
+            ]
+          },
+          "color_and_contrast": {
+            "weight": 20,
+            "criteria": [
+              {
+                "item": "Text contrast ratios",
+                "points": 8,
+                "evaluation": "All text meets WCAG AA contrast requirements (4.5:1 normal, 3:1 large)"
+              },
+              {
+                "item": "UI element contrast",
+                "points": 6,
+                "evaluation": "Interactive elements meet 3:1 contrast ratio requirement"
+              },
+              {
+                "item": "Color independence",
+                "points": 4,
+                "evaluation": "Information not conveyed by color alone"
+              },
+              {
+                "item": "High contrast mode",
+                "points": 2,
+                "evaluation": "Site remains usable in high contrast mode"
+              }
+            ]
+          },
+          "responsive_accessibility": {
+            "weight": 15,
+            "criteria": [
+              {
+                "item": "Touch target sizes",
+                "points": 8,
+                "evaluation": "All touch targets minimum 44×44px on mobile devices"
+              },
+              {
+                "item": "Mobile accessibility",
+                "points": 4,
+                "evaluation": "Screen reader functionality maintained on mobile"
+              },
+              {
+                "item": "Orientation flexibility",
+                "points": 3,
+                "evaluation": "Content accessible in both portrait and landscape orientations"
+              }
+            ]
+          }
+        }
+      },
+      "visual_design": {
+        "weight": 25,
+        "description": "Visual aesthetics, consistency, and user experience design",
+        "subcategories": {
+          "layout_and_composition": {
+            "weight": 30,
+            "criteria": [
+              {
+                "item": "Visual hierarchy",
+                "points": 8,
+                "evaluation": "Clear information hierarchy using typography, spacing, and contrast"
+              },
+              {
+                "item": "Grid system consistency",
+                "points": 6,
+                "evaluation": "Consistent spacing and alignment throughout all sections"
+              },
+              {
+                "item": "White space usage",
+                "points": 5,
+                "evaluation": "Appropriate use of white space for readability and breathing room"
+              },
+              {
+                "item": "Content organization",
+                "points": 6,
+                "evaluation": "Logical content flow and clear section delineation"
+              },
+              {
+                "item": "Professional appearance",
+                "points": 5,
+                "evaluation": "Overall design conveys professionalism and attention to detail"
+              }
+            ]
+          },
+          "typography": {
+            "weight": 25,
+            "criteria": [
+              {
+                "item": "Font selection and hierarchy",
+                "points": 8,
+                "evaluation": "Appropriate font choices with clear heading hierarchy"
+              },
+              {
+                "item": "Readability",
+                "points": 7,
+                "evaluation": "Text is legible at all screen sizes with appropriate line lengths"
+              },
+              {
+                "item": "Consistency",
+                "points": 5,
+                "evaluation": "Consistent font usage and sizing throughout site"
+              },
+              {
+                "item": "Responsive typography",
+                "points": 5,
+                "evaluation": "Text scales appropriately across all device sizes"
+              }
+            ]
+          },
+          "color_scheme": {
+            "weight": 20,
+            "criteria": [
+              {
+                "item": "Color harmony",
+                "points": 6,
+                "evaluation": "Cohesive color palette that enhances user experience"
+              },
+              {
+                "item": "Brand consistency",
+                "points": 5,
+                "evaluation": "Colors support personal brand and professional image"
+              },
+              {
+                "item": "Dark mode quality",
+                "points": 5,
+                "evaluation": "Dark theme is well-designed and easy on the eyes"
+              },
+              {
+                "item": "Accent color effectiveness",
+                "points": 4,
+                "evaluation": "Accent colors effectively highlight interactive elements"
+              }
+            ]
+          },
+          "interactive_elements": {
+            "weight": 25,
+            "criteria": [
+              {
+                "item": "Hover states",
+                "points": 6,
+                "evaluation": "Smooth, appropriate hover effects on all interactive elements"
+              },
+              {
+                "item": "Button design",
+                "points": 6,
+                "evaluation": "Buttons are clearly identifiable and follow consistent design patterns"
+              },
+              {
+                "item": "Animation quality",
+                "points": 6,
+                "evaluation": "Smooth, purposeful animations that enhance user experience"
+              },
+              {
+                "item": "Visual feedback",
+                "points": 4,
+                "evaluation": "Clear visual feedback for all user interactions"
+              },
+              {
+                "item": "Loading states",
+                "points": 3,
+                "evaluation": "Appropriate loading indicators where needed"
+              }
+            ]
+          }
+        }
+      },
+      "performance": {
+        "weight": 15,
+        "description": "Page load speed, optimization, and technical performance",
+        "subcategories": {
+          "core_web_vitals": {
+            "weight": 40,
+            "criteria": [
+              {
+                "item": "Largest Contentful Paint (LCP)",
+                "points": 15,
+                "evaluation": "LCP ≤ 2.5s (excellent), ≤ 4.0s (good), >4.0s (needs improvement)"
+              },
+              {
+                "item": "First Input Delay (FID)",
+                "points": 10,
+                "evaluation": "FID ≤ 100ms (excellent), ≤ 300ms (good), >300ms (needs improvement)"
+              },
+              {
+                "item": "Cumulative Layout Shift (CLS)",
+                "points": 15,
+                "evaluation": "CLS ≤ 0.1 (excellent), ≤ 0.25 (good), >0.25 (needs improvement)"
+              }
+            ]
+          },
+          "lighthouse_scores": {
+            "weight": 30,
+            "criteria": [
+              {
+                "item": "Performance score",
+                "points": 15,
+                "evaluation": "Lighthouse performance score ≥90 (excellent), ≥75 (good), <75 (needs improvement)"
+              },
+              {
+                "item": "Best practices score",
+                "points": 8,
+                "evaluation": "Lighthouse best practices score ≥90 (excellent), ≥75 (good)"
+              },
+              {
+                "item": "SEO score",
+                "points": 7,
+                "evaluation": "Lighthouse SEO score ≥90 (excellent), ≥75 (good)"
+              }
+            ]
+          },
+          "loading_performance": {
+            "weight": 30,
+            "criteria": [
+              {
+                "item": "Page load time",
+                "points": 12,
+                "evaluation": "Complete load ≤3s on fast 3G (excellent), ≤5s (good), >5s (poor)"
+              },
+              {
+                "item": "Resource optimization",
+                "points": 10,
+                "evaluation": "CSS/JS minified, images optimized, minimal HTTP requests"
+              },
+              {
+                "item": "Caching strategy",
+                "points": 8,
+                "evaluation": "Appropriate cache headers and resource optimization"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "cross_cutting_concerns": {
+      "responsive_design": {
+        "evaluation_points": [
+          {
+            "breakpoint": "320px-767px (Mobile)",
+            "criteria": "Single column layout, touch-friendly interface, no horizontal scroll",
+            "weight": 30
+          },
+          {
+            "breakpoint": "768px-1023px (Tablet)",
+            "criteria": "Two-column project grid, optimized touch targets, landscape support",
+            "weight": 25
+          },
+          {
+            "breakpoint": "1024px+ (Desktop)",
+            "criteria": "Three-column project grid, hover effects, optimal spacing",
+            "weight": 25
+          },
+          {
+            "breakpoint": "Cross-device consistency",
+            "criteria": "Consistent functionality and appearance across all devices",
+            "weight": 20
+          }
+        ]
+      },
+      "browser_compatibility": {
+        "evaluation_points": [
+          {
+            "browser": "Chrome (latest 2 versions)",
+            "criteria": "100% functionality, optimal performance",
+            "weight": 30
+          },
+          {
+            "browser": "Firefox (latest 2 versions)",
+            "criteria": "100% functionality, good performance",
+            "weight": 25
+          },
+          {
+            "browser": "Safari (latest 2 versions)",
+            "criteria": "100% functionality, mobile Safari optimization",
+            "weight": 25
+          },
+          {
+            "browser": "Edge (latest 2 versions)",
+            "criteria": "100% functionality, Windows integration",
+            "weight": 20
+          }
+        ]
+      }
+    },
+    "scoring_guidelines": {
+      "excellent_criteria": {
+        "score_range": "90-100",
+        "description": "Exceeds industry standards",
+        "requirements": [
+          "All core functionality works flawlessly",
+          "WCAG 2.2 AA compliance achieved",
+          "Lighthouse performance score ≥90",
+          "Cross-browser compatibility perfect",
+          "Professional visual design",
+          "No critical or high-severity bugs"
+        ]
+      },
+      "good_criteria": {
+        "score_range": "80-89",
+        "description": "Meets professional standards",
+        "requirements": [
+          "Core functionality works correctly",
+          "Minor accessibility issues only",
+          "Lighthouse performance score ≥75",
+          "Good cross-browser support",
+          "Solid visual design",
+          "No critical bugs, minimal high-severity bugs"
+        ]
+      },
+      "satisfactory_criteria": {
+        "score_range": "70-79",
+        "description": "Acceptable with improvements needed",
+        "requirements": [
+          "Basic functionality works",
+          "Some accessibility issues present",
+          "Performance acceptable but not optimal",
+          "Most browsers supported",
+          "Design needs refinement",
+          "Some high-severity bugs present"
+        ]
+      },
+      "needs_improvement_criteria": {
+        "score_range": "60-69",
+        "description": "Below professional standards",
+        "requirements": [
+          "Functionality has notable issues",
+          "Multiple accessibility violations",
+          "Performance problems evident",
+          "Browser compatibility issues",
+          "Design quality concerns",
+          "Multiple high-severity bugs"
+        ]
+      },
+      "poor_criteria": {
+        "score_range": "0-59",
+        "description": "Unacceptable quality",
+        "requirements": [
+          "Major functionality broken",
+          "Significant accessibility violations",
+          "Poor performance",
+          "Limited browser support",
+          "Unprofessional appearance",
+          "Critical bugs present"
+        ]
+      }
+    },
+    "bonus_points": {
+      "description": "Additional points for exceptional implementation",
+      "categories": [
+        {
+          "item": "Exceptional accessibility features beyond WCAG AA",
+          "points": 5,
+          "examples": "AAA level features, innovative accessibility solutions"
+        },
+        {
+          "item": "Outstanding performance optimization",
+          "points": 5,
+          "examples": "Performance score >95, innovative optimization techniques"
+        },
+        {
+          "item": "Advanced progressive enhancement",
+          "points": 3,
+          "examples": "Works perfectly without JavaScript, service worker implementation"
+        },
+        {
+          "item": "Exceptional user experience innovations",
+          "points": 3,
+          "examples": "Creative interaction patterns, delightful micro-interactions"
+        },
+        {
+          "item": "Code quality and documentation excellence",
+          "points": 2,
+          "examples": "Exemplary code comments, comprehensive documentation"
+        }
+      ]
+    },
+    "deduction_criteria": {
+      "description": "Point deductions for significant issues",
+      "categories": [
+        {
+          "item": "Critical accessibility violations",
+          "deduction": 10,
+          "examples": "Keyboard navigation broken, screen reader incompatible"
+        },
+        {
+          "item": "Major functionality failures",
+          "deduction": 15,
+          "examples": "Core features completely broken, data loss possible"
+        },
+        {
+          "item": "Security vulnerabilities",
+          "deduction": 10,
+          "examples": "XSS vulnerabilities, insecure data handling"
+        },
+        {
+          "item": "Performance regression",
+          "deduction": 5,
+          "examples": "Lighthouse score drops below 75, severe loading issues"
+        },
+        {
+          "item": "Browser compatibility failures",
+          "deduction": 8,
+          "examples": "Complete failure in major browsers"
+        }
+      ]
+    },
+    "testing_methodology": {
+      "evaluation_process": [
+        "Execute all test cases from test-case-matrix.csv",
+        "Conduct accessibility audit with screen readers and automated tools",
+        "Perform cross-browser testing on all target browsers",
+        "Run performance audits and Core Web Vitals testing",
+        "Evaluate visual design against professional standards",
+        "Document all findings with evidence (screenshots, metrics)",
+        "Calculate weighted scores for each category",
+        "Identify areas for improvement and provide recommendations"
+      ],
+      "evidence_requirements": [
+        "Screenshots for visual issues",
+        "Performance metrics and Lighthouse reports",
+        "Accessibility audit results",
+        "Cross-browser compatibility matrix",
+        "User experience flow documentation",
+        "Code quality assessment"
+      ]
+    },
+    "reporting_format": {
+      "executive_summary": {
+        "overall_score": "Weighted total out of 100",
+        "grade": "Letter grade based on score range",
+        "key_strengths": "Top 3 areas of excellence",
+        "priority_improvements": "Top 3 areas needing attention",
+        "compliance_status": "WCAG 2.2 AA compliance percentage"
+      },
+      "detailed_scores": {
+        "functionality": "Score out of 35 with subcategory breakdown",
+        "accessibility": "Score out of 25 with WCAG compliance details",
+        "visual_design": "Score out of 25 with design evaluation",
+        "performance": "Score out of 15 with Core Web Vitals metrics"
+      },
+      "recommendations": {
+        "high_priority": "Issues requiring immediate attention",
+        "medium_priority": "Improvements for next iteration",
+        "low_priority": "Enhancement opportunities",
+        "future_considerations": "Long-term improvement suggestions"
+      }
+    }
+  }
+}

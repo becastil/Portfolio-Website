@@ -1,0 +1,195 @@
+/* Blog-specific CSS optimizations */
+
+/* GPU acceleration for better performance */
+.gpu-accelerated {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .parallax-disabled {
+    transform: none !important;
+  }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 9999;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Blog content styles */
+.prose {
+  /* Ensure proper text contrast */
+  color: rgb(55 65 81);
+}
+
+.prose.dark {
+  color: rgb(209 213 219);
+}
+
+/* Code block improvements */
+.prose pre {
+  background: rgb(31 41 55);
+  color: rgb(243 244 246);
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(75 85 99) transparent;
+}
+
+.prose pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  background: rgb(75 85 99);
+  border-radius: 3px;
+}
+
+/* Loading states */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Custom scrollbar for blog content */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(156 163 175) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(156 163 175);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(107 114 128);
+}
+
+/* Focus styles for better accessibility */
+.focus-visible:focus {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .prose {
+    color: black;
+  }
+  
+  .prose.dark {
+    color: white;
+  }
+  
+  .border-gray-200 {
+    border-color: black;
+  }
+  
+  .dark .border-gray-700 {
+    border-color: white;
+  }
+}
+
+/* Performance optimizations */
+.blog-card {
+  contain: layout style paint;
+}
+
+.blog-hero {
+  contain: layout style;
+}
+
+/* Image optimization */
+.blog-image {
+  object-fit: cover;
+  object-position: center;
+  loading: lazy;
+}
+
+/* Intersection observer optimization */
+.blog-section {
+  contain: layout style paint;
+}
+
+/* Animation performance */
+@supports (transform: translateZ(0)) {
+  .animate-transform {
+    transform: translateZ(0);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .prose {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .prose h1 {
+    font-size: 18pt;
+  }
+  
+  .prose h2 {
+    font-size: 16pt;
+  }
+  
+  .prose h3 {
+    font-size: 14pt;
+  }
+}
