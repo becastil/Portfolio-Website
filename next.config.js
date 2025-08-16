@@ -2,10 +2,6 @@
 const nextConfig = {
   output: 'export',
   
-  // GitHub Pages deployment
-  basePath: process.env.NODE_ENV === 'production' ? '' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  
   // Optimize images
   images: {
     unoptimized: true, // Required for static export
@@ -25,10 +21,6 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // Experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-  },
   
   // Custom webpack configuration
   webpack: (config, { isServer }) => {

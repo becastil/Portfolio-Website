@@ -108,18 +108,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/robots.txt",
-      "destination": "/robots.txt"
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap.xml"
-    }
-  ],
-  "trailingSlash": false,
-  "cleanUrls": true,
-  "regions": ["iad1"]
+  ]
 }
