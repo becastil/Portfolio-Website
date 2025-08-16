@@ -16,12 +16,12 @@ interface RelatedPost {
   title: string
   slug: { current: string }
   excerpt: string
-  mainImage: {
+  mainImage?: {
     asset: { url: string }
     alt: string
   }
-  publishedAt: string
-  readingTime: number
+  publishedAt?: string
+  readingTime?: number
 }
 
 interface RelatedPostsProps {
@@ -59,11 +59,13 @@ export default function RelatedPosts({ posts }: RelatedPostsProps) {
 }
 
 function RelatedPostCard({ post }: { post: RelatedPost }) {
-  const formattedDate = new Date(post.publishedAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
+  const formattedDate = post.publishedAt 
+    ? new Date(post.publishedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    : null
 
   return (
     <ScaleIn>
@@ -73,40 +75,44 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         {/* Image */}
-        <div className="relative overflow-hidden aspect-[4/3]">
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
-            <Image
-              src={post.mainImage.asset.url}
-              alt={post.mainImage.alt}
-              fill
-              className="object-cover"
-            />
-          </motion.div>
-          
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
-          {/* Read More Button (appears on hover) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileHover={{ opacity: 1, y: 0 }}
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
-          >
-            <Link href={`/blog/${post.slug.current}`}>
-              <motion.div
-                className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-lg font-medium hover:bg-white transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Read Article
-                <ArrowRight className="w-4 h-4" />
-              </motion.div>
-            </Link>
-          </motion.div>
-        </div>
+        {post.mainImage ? (
+          <div className="relative overflow-hidden aspect-[4/3]">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <Image
+                src={post.mainImage.asset.url}
+                alt={post.mainImage.alt}
+                fill
+                className="object-cover"
+              />
+            </motion.div>
+            
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            
+            {/* Read More Button (appears on hover) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileHover={{ opacity: 1, y: 0 }}
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+            >
+              <Link href={`/blog/${post.slug.current}`}>
+                <motion.div
+                  className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-lg font-medium hover:bg-white transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Read Article
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              </Link>
+            </motion.div>
+          </div>
+        ) : (
+          <div className="relative overflow-hidden aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
+        )}
 
         {/* Content */}
         <div className="p-6">
@@ -125,14 +131,18 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
           <FadeIn delay={0.3}>
             <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {formattedDate}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {post.readingTime}m
-                </div>
+                {formattedDate && (
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {formattedDate}
+                  </div>
+                )}
+                {post.readingTime && (
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {post.readingTime}m
+                  </div>
+                )}
               </div>
 
               <Link href={`/blog/${post.slug.current}`}>
