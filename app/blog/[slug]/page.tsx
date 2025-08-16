@@ -4,6 +4,23 @@ import { notFound } from 'next/navigation'
 import BlogPost from '@/components/blog/BlogPost'
 import { siteMetadata } from '@/lib/constants'
 
+// Generate static params for all blog posts
+export async function generateStaticParams() {
+  // Mock blog slugs - replace with actual Sanity query
+  const mockSlugs = [
+    'framer-motion-interactive-web',
+    'progressive-enhancement-modern-web', 
+    'typescript-best-practices-scalable',
+    'css-grid-vs-flexbox-guide',
+    'css-vs-js-animations',
+    'demo'  // For the demo page
+  ]
+  
+  return mockSlugs.map((slug) => ({
+    slug: slug,
+  }))
+}
+
 // Mock function - replace with actual Sanity query
 async function getPost(slug: string) {
   // Simulate API call
