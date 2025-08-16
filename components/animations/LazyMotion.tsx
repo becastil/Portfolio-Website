@@ -1,11 +1,8 @@
 'use client'
 
-import { lazy, Suspense, ReactNode } from 'react'
+import { Suspense, ReactNode } from 'react'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-
-// Lazy load heavy animation components
-const HeavyAnimation = lazy(() => import('./HeavyAnimation'))
 
 interface LazyMotionProps {
   children: ReactNode
