@@ -38,11 +38,13 @@ export default function MotionWrapper({
   }
 
   // Create optimized transitions for performance
-  const optimizedTransition = {
-    duration: shouldReduceMotion ? 0 : (transition?.duration ?? 0.6),
-    ease: shouldReduceMotion ? 'linear' : (transition?.ease ?? [0.25, 0.46, 0.45, 0.94]),
-    ...transition,
-  }
+  const optimizedTransition = shouldReduceMotion 
+    ? { duration: 0 }
+    : {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+        ...transition,
+      }
 
   const optimizedInitial = shouldReduceMotion ? {} : initial
   const optimizedAnimate = shouldReduceMotion ? {} : animate
