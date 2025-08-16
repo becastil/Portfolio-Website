@@ -32,6 +32,7 @@ export interface FormData {
 export interface FormErrors {
   name?: string
   email?: string
+  subject?: string
   message?: string
 }
 
