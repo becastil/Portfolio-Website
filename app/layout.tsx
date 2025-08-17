@@ -1,15 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { siteMetadata } from '@/lib/constants'
 import MotionProvider from '@/components/providers/MotionProvider'
 import PageTransition from '@/components/providers/PageTransition'
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
 
 export const metadata: Metadata = {
   title: {
@@ -88,20 +81,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Critical resource hints */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* Preload critical fonts */}
-        <link 
-          rel="preload" 
-          href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" 
-          as="font" 
-          type="font/woff2" 
-          crossOrigin="anonymous" 
-        />
+        {/* SF Mono uses system fonts - no preloading needed */}
         
         {/* Preload critical CSS */}
         <link rel="preload" href="/tokens.css" as="style" />
@@ -113,7 +95,7 @@ export default function RootLayout({
             :root{--color-text-primary:#000000;--color-text-secondary:#666666;--color-background:#FFFFFF;--color-surface:#F8F8F8;--color-accent:#CC7A5C;--color-accent-hover:#D88A6C}
             [data-theme="dark"]{--color-text-primary:#FFFFFF;--color-text-secondary:#CCCCCC;--color-background:#0D0D0D;--color-surface:#1A1A1A;--color-accent:#CC7A5C;--color-accent-hover:#D88A6C}
             html{scroll-behavior:smooth;overflow-x:hidden}
-            body{font-family:var(--font-inter),system-ui,sans-serif;background:var(--color-background);color:var(--color-text-primary);margin:0;padding:0}
+            body{font-family:'SF Mono',Monaco,'Cascadia Code','Roboto Mono',Consolas,monospace;background:var(--color-background);color:var(--color-text-primary);margin:0;padding:0}
             .container{max-width:1200px;margin:0 auto;padding:0 1rem}
             .section{padding:5rem 0}
             .skip-link{position:absolute;top:0;left:0;background:var(--color-accent);color:white;padding:1rem;z-index:50;transform:translateY(-100%);transition:transform 0.3s}
@@ -132,7 +114,7 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-mono antialiased">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

@@ -36,14 +36,19 @@
   }
 
   body {
-    @apply text-text-primary bg-background;
-    font-family: var(--font-family-base);
+    @apply text-text-primary bg-background font-mono;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
+    font-variant-ligatures: common-ligatures;
   }
 
-  /* Typography defaults */
+  /* Typography defaults with unified monospace system */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-mono;
+    font-variant-numeric: lining-nums;
+  }
+  
   h1 { @apply text-5xl font-bold; }
   h2 { @apply text-4xl font-bold; }
   h3 { @apply text-3xl font-bold; }
@@ -52,8 +57,28 @@
   h6 { @apply text-lg font-semibold; }
 
   p {
-    @apply text-text-secondary leading-relaxed;
+    @apply text-text-secondary leading-relaxed font-mono;
     max-width: 65ch;
+    font-variant-numeric: lining-nums;
+  }
+  
+  /* All elements use monospace font */
+  nav, .nav-item {
+    @apply font-mono;
+  }
+  
+  /* Interactive elements use monospace font */
+  button, a {
+    @apply font-mono;
+  }
+  
+  /* Form elements use monospace font */
+  input, textarea, select {
+    @apply font-mono;
+  }
+  
+  label {
+    @apply font-mono font-medium;
   }
 
   /* Focus visible styles */
@@ -76,7 +101,7 @@
 
   /* Button base styles */
   .btn {
-    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+    @apply px-6 py-3 rounded-xl font-mono font-semibold transition-all duration-300;
     @apply hover:translate-y-[-1px] hover:shadow-md;
     @apply focus-visible:outline-2 focus-visible:outline-offset-2;
     min-height: 44px;
@@ -99,7 +124,7 @@
   }
 
   .form-label {
-    @apply block font-medium text-text-primary mb-2;
+    @apply block font-mono font-medium text-text-primary mb-2;
   }
 
   /* Card component */
