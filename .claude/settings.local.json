@@ -16,7 +16,16 @@
       "Bash(node test-eslint.js)",
       "Bash(rm:*)",
       "Bash(npm run dev:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:formless.xyz)",
+      "WebSearch",
+      "WebFetch(domain:docs.formless.xyz)",
+      "WebFetch(domain:share.formless.xyz)",
+      "Bash(lsof:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(mv:*)",
+      "Bash(npm run lighthouse:*)"
     ],
     "deny": [],
     "ask": []
