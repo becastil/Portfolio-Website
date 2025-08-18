@@ -25,7 +25,8 @@
       "Bash(npx playwright install:*)",
       "Bash(npx playwright test:*)",
       "Bash(mv:*)",
-      "Bash(npm run lighthouse:*)"
+      "Bash(npm run lighthouse:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
