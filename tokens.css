@@ -23,6 +23,16 @@ Anthropic-inspired design system with responsive scaling
   --color-error: #DC2626;
   --color-success: #059669;
   
+  /* Monochrome Panel System - Formless-inspired */
+  --bg: hsl(0 0% 100%);           /* pure light background */
+  --text: hsl(222 47% 10%);       /* near-black text */
+  --muted: hsl(215 16% 46%);      /* secondary text */
+  --panel: hsl(0 0% 100%);        /* neutral panel */
+  --panel-2: hsl(210 20% 98%);    /* subtle hover panel */
+  --border: hsl(220 13% 90%);     /* crisp 1px borders */
+  --accent: hsl(0 0% 12%);        /* deep neutral for CTA */
+  --accent-ink: hsl(0 0% 100%);   /* text on accent */
+  
   /* Typography Scale - Responsive */
   --font-size-xs: 0.875rem;   /* 14px */
   --font-size-sm: 1rem;       /* 16px */
@@ -88,10 +98,29 @@ Anthropic-inspired design system with responsive scaling
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
   
+  /* Micro-interaction Shadows */
+  --shadow-hover-primary: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+  --shadow-hover-secondary: 0 8px 20px -8px rgba(0, 0, 0, 0.12);
+  --shadow-active: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
   /* Transition Timing */
   --transition-fast: 200ms ease-in-out;
   --transition-normal: 300ms ease-in-out;
   --transition-slow: 400ms ease-in-out;
+  
+  /* Animation Durations - Formless-inspired */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-deliberate: 700ms;
+  
+  /* Easing Curves - Sophisticated motion */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);      /* Smooth deceleration */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);      /* Natural stop */
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);  /* Balanced motion */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1); /* Subtle bounce */
+  --ease-formless: cubic-bezier(0.2, 0.6, 0, 1);        /* Formless signature */
   
   /* Touch Target Standards */
   --touch-target-min: 44px;
@@ -125,6 +154,16 @@ Anthropic-inspired design system with responsive scaling
   --color-neutral-warm: #4A453F;
   --color-error: #EF4444;
   --color-success: #10B981;
+  
+  /* Monochrome Panel System - Dark Mode */
+  --bg: hsl(224 15% 8%);          /* near-black background */
+  --text: hsl(210 40% 98%);       /* near-white text */
+  --muted: hsl(217 15% 65%);      /* secondary text */
+  --panel: hsl(224 14% 12%);      /* neutral panel */
+  --panel-2: hsl(224 14% 10%);    /* subtle hover panel */
+  --border: hsl(224 10% 24%);     /* crisp borders */
+  --accent: hsl(0 0% 88%);        /* light neutral for CTA on dark */
+  --accent-ink: hsl(234 50% 12%); /* dark ink on light accent */
 }
 
 /* Responsive Token Adjustments */

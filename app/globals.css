@@ -85,6 +85,14 @@
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-accent-focus;
   }
+  
+  /* Enhanced focus states for interactive elements */
+  a:focus-visible,
+  button:focus-visible {
+    @apply outline-2 outline-offset-4 outline-accent-focus;
+    outline-style: solid;
+    border-radius: var(--radius-md);
+  }
 }
 
 /* Component layer */
@@ -142,6 +150,33 @@
 
 /* Utility layer extensions */
 @layer utilities {
+  /* Micro-interaction utilities */
+  .transition-formless {
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-formless);
+  }
+  
+  .transition-smooth {
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-out-expo);
+  }
+  
+  .transition-spring {
+    transition-duration: var(--duration-slow);
+    transition-timing-function: var(--ease-spring);
+  }
+  
+  /* Hover lift effect */
+  .hover-lift {
+    transition: transform var(--duration-normal) var(--ease-out-expo),
+                box-shadow var(--duration-normal) var(--ease-out-expo);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover-secondary);
+  }
+  
   /* Screen reader only */
   .sr-only {
     @apply absolute w-px h-px p-0 -m-px overflow-hidden;
