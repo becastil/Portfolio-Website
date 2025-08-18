@@ -135,6 +135,16 @@ Anthropic-inspired design system with responsive scaling
   --z-popover: 1060;
   --z-tooltip: 1070;
   --z-toast: 1080;
+  
+  /* Interactive Overlay Colors - Formless-inspired */
+  --overlay-blue: hsl(199 89% 68%);     /* Soft sky blue #60A5FA */
+  --overlay-green: hsl(160 60% 51%);    /* Soft teal green #34D399 */
+  --overlay-accent: hsl(280 65% 60%);   /* Subtle purple accent */
+  
+  /* Overlay opacity modifiers */
+  --overlay-opacity-rest: 0.15;
+  --overlay-opacity-hover: 0.25;
+  --overlay-blur-amount: 80px;
 }
 
 /* Dark Theme Tokens */
@@ -164,6 +174,15 @@ Anthropic-inspired design system with responsive scaling
   --border: hsl(224 10% 24%);     /* crisp borders */
   --accent: hsl(0 0% 88%);        /* light neutral for CTA on dark */
   --accent-ink: hsl(234 50% 12%); /* dark ink on light accent */
+  
+  /* Interactive Overlay Colors - Dark Mode */
+  --overlay-blue: hsl(199 70% 50%);     /* Deeper blue for dark mode */
+  --overlay-green: hsl(160 50% 40%);    /* Deeper teal for dark mode */
+  --overlay-accent: hsl(280 50% 45%);   /* Deeper purple for dark mode */
+  
+  /* Adjusted opacity for dark mode */
+  --overlay-opacity-rest: 0.08;
+  --overlay-opacity-hover: 0.15;
 }
 
 /* Responsive Token Adjustments */

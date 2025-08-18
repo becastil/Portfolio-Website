@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
+import HeroOverlay from './HeroOverlay'
 
 export default function Hero() {
   const shouldReduceMotion = useReducedMotion()
@@ -79,15 +80,19 @@ export default function Hero() {
       className="relative bg-[var(--bg)] text-[var(--text)] py-24 sm:py-32 overflow-hidden" 
       aria-labelledby="hero-heading"
     >
+      {/* Interactive color overlay - Formless-inspired */}
+      <HeroOverlay />
+      
       {/* Subtle background gradient for depth */}
       <div 
         className="absolute inset-0 opacity-[0.02] pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at top, var(--accent), transparent 60%)'
+          background: 'radial-gradient(ellipse at top, var(--accent), transparent 60%)',
+          zIndex: 0
         }}
       />
       
-      <div className="mx-auto max-w-[66ch] px-4 sm:px-6 relative">
+      <div className="mx-auto max-w-[66ch] px-4 sm:px-6 relative" style={{ zIndex: 2 }}>
         <motion.div
           variants={containerVariants}
           initial="hidden"
