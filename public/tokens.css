@@ -1,0 +1,228 @@
+/*
+==================================================
+DESIGN TOKENS - CSS CUSTOM PROPERTIES
+Anthropic-inspired design system with responsive scaling
+==================================================
+*/
+
+:root {
+  /* Formless-inspired Color System - Light Theme */
+  --color-text-primary: hsl(222 47% 10%);      /* Deep charcoal text */
+  --color-text-secondary: hsl(215 16% 46%);    /* Muted secondary text */
+  --color-text-muted: hsl(220 9% 65%);         /* Subtle muted text */
+  --color-background: hsl(0 0% 100%);          /* Pure white background */
+  --color-background-subtle: hsl(210 20% 98%); /* Subtle off-white */
+  --color-border: hsl(220 13% 85%);            /* Higher contrast light borders */
+  --color-accent: hsl(245 84% 60%);            /* Deep indigo primary */
+  --color-accent-hover: hsl(245 84% 65%);      /* Lighter indigo hover */
+  --color-accent-text: hsl(245 84% 60%);       /* Indigo text */
+  --color-accent-focus: hsl(245 84% 55%);      /* Darker indigo focus */
+  --color-surface: hsl(210 20% 98%);           /* Light surface */
+  --color-surface-hover: hsl(210 20% 96%);     /* Hover surface */
+  --color-neutral-warm: hsl(220 9% 65%);       /* Neutral warm tone */
+  --color-error: hsl(0 84% 60%);               /* Error red */
+  --color-success: hsl(142 76% 36%);           /* Success green */
+  
+  /* Formless Monochrome System - Light Mode */
+  --bg: hsl(0 0% 100%);                        /* Pure white background */
+  --text: hsl(222 47% 10%);                    /* Deep charcoal text */
+  --muted: hsl(215 16% 46%);                   /* Secondary text */
+  --panel: hsl(210 20% 98%);                   /* Light panel */
+  --panel-2: hsl(210 20% 96%);                 /* Subtle hover panel */
+  --border: hsl(220 13% 85%);                  /* Higher contrast borders */
+  --accent: hsl(245 84% 60%);                  /* Deep indigo CTA */
+  --accent-ink: hsl(0 0% 100%);                /* White text on accent */
+  
+  /* Gradient Accent Colors - Formless-inspired */
+  --gradient-primary: hsl(245 84% 60%);        /* Deep indigo */
+  --gradient-secondary: hsl(158 64% 52%);      /* Mint teal */
+  --gradient-tertiary: hsl(280 65% 60%);       /* Violet accent */
+  
+  /* Typography Scale - Responsive */
+  --font-size-xs: 0.875rem;   /* 14px */
+  --font-size-sm: 1rem;       /* 16px */
+  --font-size-base: 1.125rem; /* 18px - Anthropic base */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 1.875rem;  /* 30px */
+  --font-size-3xl: 2.25rem;   /* 36px */
+  --font-size-4xl: 2.75rem;   /* 44px */
+  --font-size-5xl: 3.5rem;    /* 56px */
+  
+  /* Font Families - Unified SF Mono Typography System */
+  --font-family-heading: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  --font-family-body: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  --font-family-base: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line Heights */
+  --line-height-tight: 1.4;
+  --line-height-normal: 1.75;
+  --line-height-relaxed: 1.8;
+  
+  /* Spacing Scale - Anthropic Generous Spacing */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-28: 7rem;     /* 112px */
+  --space-32: 7.5rem;   /* 120px */
+  
+  /* Layout Tokens */
+  --container-max-width: 1200px;
+  --container-padding: var(--space-4);
+  
+  /* Breakpoint Tokens */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  
+  /* Border Radius Scale - Formless-inspired */
+  --radius-sm: 0.75rem;    /* 12px - More generous */
+  --radius-md: 1rem;       /* 16px - Calm rounded corners */
+  --radius-lg: 1.25rem;    /* 20px - Spacious feel */
+  --radius-xl: 1.5rem;     /* 24px - Premium rounded */
+  
+  /* Shadow System - Formless Subtle */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* Micro-interaction Shadows */
+  --shadow-hover-primary: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+  --shadow-hover-secondary: 0 8px 20px -8px rgba(0, 0, 0, 0.12);
+  --shadow-active: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  /* Transition Timing */
+  --transition-fast: 200ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+  
+  /* Animation Durations - Formless-inspired */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-deliberate: 700ms;
+  
+  /* Easing Curves - Sophisticated motion */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);      /* Smooth deceleration */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);      /* Natural stop */
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);  /* Balanced motion */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1); /* Subtle bounce */
+  --ease-formless: cubic-bezier(0.2, 0.6, 0, 1);        /* Formless signature */
+  
+  /* Touch Target Standards */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  
+  /* Z-index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+  
+  /* Interactive Overlay Colors - Formless-inspired */
+  --overlay-blue: hsl(245 84% 60%);     /* Deep indigo primary */
+  --overlay-green: hsl(158 64% 52%);    /* Mint teal secondary */
+  --overlay-purple: hsl(245 84% 60%);   /* Deep indigo */
+  --overlay-violet: hsl(280 65% 60%);   /* Violet accent */
+  
+  /* Overlay opacity modifiers */
+  --overlay-opacity-rest: 0.15;
+  --overlay-opacity-hover: 0.25;
+  --overlay-blur-amount: 120px;
+}
+
+/* Dark Theme Tokens */
+[data-theme="dark"] {
+  --color-text-primary: hsl(210 40% 98%);       /* Near-white text */
+  --color-text-secondary: hsl(217 15% 65%);     /* Muted secondary text */
+  --color-text-muted: hsl(220 9% 55%);          /* Subtle muted text */
+  --color-background: hsl(224 15% 8%);          /* Near-black background */
+  --color-background-subtle: hsl(224 14% 12%);  /* Subtle dark surface */
+  --color-border: hsl(224 10% 20%);             /* Higher contrast dark borders */
+  --color-accent: hsl(245 84% 60%);             /* Deep indigo primary */
+  --color-accent-hover: hsl(245 84% 65%);       /* Lighter indigo hover */
+  --color-accent-text: hsl(245 84% 60%);        /* Indigo text */
+  --color-accent-focus: hsl(245 84% 55%);       /* Darker indigo focus */
+  --color-surface: hsl(224 14% 12%);            /* Dark surface */
+  --color-surface-hover: hsl(224 14% 16%);      /* Hover surface */
+  --color-neutral-warm: hsl(220 9% 55%);        /* Neutral warm tone */
+  --color-error: hsl(0 84% 60%);                /* Error red */
+  --color-success: hsl(142 76% 36%);            /* Success green */
+  
+  /* Monochrome Panel System - Dark Mode */
+  --bg: hsl(224 15% 8%);          /* Near-black background */
+  --text: hsl(210 40% 98%);       /* Near-white text */
+  --muted: hsl(217 15% 65%);      /* Secondary text */
+  --panel: hsl(224 14% 12%);      /* Neutral panel */
+  --panel-2: hsl(224 14% 16%);    /* Subtle hover panel */
+  --border: hsl(224 10% 20%);     /* Higher contrast borders */
+  --accent: hsl(245 84% 60%);     /* Deep indigo CTA */
+  --accent-ink: hsl(0 0% 100%);   /* White text on accent */
+  
+  /* Interactive Overlay Colors - Dark Mode */
+  --overlay-blue: hsl(245 84% 50%);     /* Deep indigo primary for dark mode */
+  --overlay-green: hsl(158 64% 42%);    /* Mint teal secondary for dark mode */
+  --overlay-purple: hsl(245 84% 50%);   /* Deep indigo for dark mode */
+  --overlay-violet: hsl(280 65% 50%);   /* Violet accent for dark mode */
+  
+  /* Adjusted opacity for dark mode */
+  --overlay-opacity-rest: 0.2;
+  --overlay-opacity-hover: 0.35;
+}
+
+/* Responsive Token Adjustments */
+@media (max-width: 374px) {
+  :root {
+    --container-padding: var(--space-3);
+    --section-padding: var(--space-8);
+  }
+}
+
+@media (min-width: 375px) and (max-width: 767px) {
+  :root {
+    --container-padding: var(--space-4);
+    --section-padding: var(--space-12);
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --container-padding: var(--space-8);
+    --section-padding: var(--space-20);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-padding: var(--space-28);
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --container-padding: var(--space-12);
+    --section-padding: var(--space-32);
+  }
+}

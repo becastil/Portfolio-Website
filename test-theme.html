@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme System Test</title>
+    <style>
+        :root {
+            --color-text-primary: #000;
+            --color-background: #fff;
+            --color-accent: #5656ec;
+        }
+        
+        [data-theme="dark"] {
+            --color-text-primary: #fff;
+            --color-background: #0d0d0d;
+            --color-accent: #5656ec;
+        }
+        
+        body {
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            font-family: monospace;
+            padding: 2rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        button {
+            background: var(--color-accent);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(86, 86, 236, 0.1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme System Test</h1>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+    <div class="status">
+        Current theme: <span id="themeStatus">light</span>
+    </div>
+    
+    <script>
+        let currentTheme = localStorage.getItem('portfolio-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        document.getElementById('themeStatus').textContent = currentTheme;
+        
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('portfolio-theme', currentTheme);
+            document.getElementById('themeStatus').textContent = currentTheme;
+            
+            // Announce to screen readers
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.textContent = `Theme changed to ${currentTheme} mode`;
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -27,7 +27,9 @@
       "Bash(mv:*)",
       "Bash(npm run lighthouse:*)",
       "Bash(node:*)",
-      "Bash(pgrep:*)"
+      "Bash(pgrep:*)",
+      "Bash(true)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
