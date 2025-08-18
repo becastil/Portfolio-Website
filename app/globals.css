@@ -28,129 +28,229 @@
   }
 }
 
-/* Base layer overrides */
+/* Enhanced base layer */
 @layer base {
   html {
-    @apply scroll-smooth;
+    @apply scroll-smooth theme-transition;
     overflow-x: hidden;
   }
 
   body {
-    @apply text-text-primary bg-background font-mono;
+    @apply text-text-primary bg-background font-mono theme-transition;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
     font-variant-ligatures: common-ligatures;
   }
 
-  /* Typography defaults with unified monospace system */
+  /* Enhanced typography with token integration */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-mono;
+    @apply font-mono theme-transition;
     font-variant-numeric: lining-nums;
   }
   
-  h1 { @apply text-5xl font-bold; }
-  h2 { @apply text-4xl font-bold; }
-  h3 { @apply text-3xl font-bold; }
-  h4 { @apply text-2xl font-bold; }
-  h5 { @apply text-xl font-semibold; }
-  h6 { @apply text-lg font-semibold; }
+  h1 { @apply text-5xl font-bold leading-tight; }
+  h2 { @apply text-4xl font-bold leading-tight; }
+  h3 { @apply text-3xl font-bold leading-tight; }
+  h4 { @apply text-2xl font-bold leading-tight; }
+  h5 { @apply text-xl font-semibold leading-tight; }
+  h6 { @apply text-lg font-semibold leading-normal; }
 
   p {
-    @apply text-text-secondary leading-relaxed font-mono;
+    @apply text-text-secondary leading-relaxed font-mono theme-transition;
     max-width: 65ch;
     font-variant-numeric: lining-nums;
   }
   
-  /* All elements use monospace font */
-  nav, .nav-item {
-    @apply font-mono;
+  /* Enhanced interactive elements */
+  a {
+    @apply font-mono theme-transition;
   }
   
-  /* Interactive elements use monospace font */
-  button, a {
-    @apply font-mono;
+  button {
+    @apply font-mono theme-transition;
   }
   
-  /* Form elements use monospace font */
   input, textarea, select {
-    @apply font-mono;
+    @apply font-mono theme-transition;
   }
   
   label {
-    @apply font-mono font-medium;
+    @apply font-mono font-medium theme-transition;
   }
 
-  /* Focus visible styles */
+  /* Enhanced focus states using tokens */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-accent-focus;
-  }
-  
-  /* Enhanced focus states for interactive elements */
-  a:focus-visible,
-  button:focus-visible {
-    @apply outline-2 outline-offset-4 outline-accent-focus;
+    @apply outline-2 outline-offset-2;
+    outline-color: var(--color-accent-focus);
     outline-style: solid;
-    border-radius: var(--radius-md);
   }
 }
 
-/* Component layer */
+/* Enhanced component layer */
 @layer components {
-  /* Container component */
+  /* Container system using tokens */
   .container {
-    @apply max-w-[1200px] mx-auto px-4 md:px-8 lg:px-12;
+    @apply max-w-container mx-auto px-container-padding;
   }
 
-  /* Section spacing */
+  /* Section spacing using responsive tokens */
   .section {
-    @apply py-20 md:py-24 lg:py-28;
+    @apply py-section-padding;
   }
 
-  /* Button base styles */
+  /* Enhanced button system */
   .btn {
-    @apply px-6 py-3 rounded-xl font-mono font-semibold transition-all duration-300;
-    @apply hover:translate-y-[-1px] hover:shadow-md;
-    @apply focus-visible:outline-2 focus-visible:outline-offset-2;
-    min-height: 44px;
+    @apply px-6 py-3 rounded-md font-mono font-semibold;
+    @apply transition-all duration-normal ease-formless;
+    @apply min-h-touch min-w-touch flex items-center justify-center gap-2;
+    @apply hover:translate-y-[-1px] hover:shadow-hover-secondary;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-focus;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-white hover:bg-accent-hover;
+    @apply btn bg-accent text-accent-ink hover:bg-accent-hover;
   }
 
   .btn-secondary {
-    @apply btn border-2 border-accent text-accent-text hover:bg-accent hover:text-white;
+    @apply btn border-2 border-accent text-accent-text;
+    @apply hover:bg-accent hover:text-accent-ink;
   }
 
-  /* Form elements */
+  .btn-ghost {
+    @apply btn text-text-secondary hover:text-text-primary hover:bg-surface-hover;
+  }
+
+  .btn-icon {
+    @apply btn p-3 min-w-touch;
+  }
+
+  /* Enhanced form elements */
   .form-input {
-    @apply w-full px-4 py-3 border border-border rounded-lg bg-surface;
-    @apply text-text-primary transition-all duration-300;
-    @apply focus:outline-none focus:border-accent focus:ring-2 focus:ring-blue-500/10;
-    min-height: 44px;
+    @apply w-full px-4 py-3 border border-border rounded-md bg-surface;
+    @apply text-text-primary font-mono transition-all duration-normal ease-formless;
+    @apply focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10;
+    @apply min-h-touch placeholder:text-text-muted;
   }
 
   .form-label {
     @apply block font-mono font-medium text-text-primary mb-2;
   }
 
-  /* Card component */
-  .card {
-    @apply bg-surface border border-border rounded-lg p-8;
-    @apply transition-all duration-300 hover:shadow-md;
+  .form-error {
+    @apply text-error text-sm font-mono mt-1;
   }
 
-  /* Tech tag */
+  .form-help {
+    @apply text-text-muted text-sm font-mono mt-1;
+  }
+
+  /* Enhanced card system */
+  .card {
+    @apply bg-surface border border-border rounded-lg p-8;
+    @apply transition-all duration-normal ease-formless;
+    @apply hover:shadow-hover-secondary hover:translate-y-[-1px];
+  }
+
+  .card-flat {
+    @apply bg-surface border border-border rounded-lg p-6;
+  }
+
+  .card-elevated {
+    @apply card shadow-md hover:shadow-lg;
+  }
+
+  /* Navigation components */
+  .nav-link {
+    @apply font-mono font-medium text-text-secondary;
+    @apply transition-all duration-normal ease-formless;
+    @apply hover:text-text-primary focus-visible:text-accent;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-focus;
+    @apply rounded-sm px-3 py-2 min-h-touch flex items-center;
+  }
+
+  .nav-link-active {
+    @apply nav-link text-accent bg-surface-hover;
+  }
+
+  /* Breadcrumb navigation */
+  .breadcrumb {
+    @apply flex items-center gap-2 text-sm font-mono;
+  }
+
+  .breadcrumb-item {
+    @apply text-text-muted hover:text-text-primary transition-colors duration-normal ease-formless;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-focus;
+    @apply rounded-sm;
+  }
+
+  .breadcrumb-item:not(:last-child)::after {
+    content: '/';
+    @apply text-text-muted ml-2;
+  }
+
+  .breadcrumb-current {
+    @apply text-text-primary font-medium;
+  }
+
+  /* Badge components */
+  .badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-sm font-mono font-medium;
+    @apply bg-surface-hover text-text-secondary rounded-md;
+  }
+
+  .badge-accent {
+    @apply badge bg-accent/10 text-accent;
+  }
+
+  .badge-success {
+    @apply badge bg-success/10 text-success;
+  }
+
+  .badge-error {
+    @apply badge bg-error/10 text-error;
+  }
+
+  /* Tech tag enhanced */
   .tech-tag {
-    @apply text-sm px-3 py-2 bg-surface-hover text-text-secondary;
-    @apply rounded-md font-medium;
+    @apply badge transition-all duration-normal ease-formless;
+    @apply hover:bg-accent/10 hover:text-accent hover:scale-105;
+  }
+
+  /* Loading states */
+  .skeleton {
+    @apply bg-surface-hover rounded-md animate-pulse;
+  }
+
+  .loading-shimmer {
+    @apply bg-gradient-to-r from-surface via-surface-hover to-surface;
+    @apply bg-[length:200%_100%] animate-[shimmer_1.5s_infinite];
+  }
+
+  /* Interactive overlays */
+  .overlay-gradient {
+    @apply absolute inset-0 rounded-md opacity-overlay-rest;
+    @apply transition-opacity duration-normal ease-formless;
+    background: linear-gradient(135deg, var(--overlay-blue), var(--overlay-green));
+  }
+
+  .overlay-gradient:hover {
+    @apply opacity-overlay-hover;
+  }
+
+  /* Focus management */
+  .focus-ring {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-focus;
+  }
+
+  .focus-ring-inset {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent-focus;
   }
 }
 
-/* Utility layer extensions */
+/* Enhanced utility layer */
 @layer utilities {
-  /* Micro-interaction utilities */
+  /* Animation utilities using tokens */
   .transition-formless {
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-formless);
@@ -165,8 +265,16 @@
     transition-duration: var(--duration-slow);
     transition-timing-function: var(--ease-spring);
   }
+
+  .transition-instant {
+    transition-duration: var(--duration-instant);
+  }
+
+  .transition-deliberate {
+    transition-duration: var(--duration-deliberate);
+  }
   
-  /* Hover lift effect */
+  /* Enhanced micro-interactions */
   .hover-lift {
     transition: transform var(--duration-normal) var(--ease-out-expo),
                 box-shadow var(--duration-normal) var(--ease-out-expo);
@@ -176,8 +284,57 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-hover-secondary);
   }
+
+  .hover-scale {
+    transition: transform var(--duration-normal) var(--ease-spring);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-glow {
+    transition: box-shadow var(--duration-normal) var(--ease-formless);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px -5px var(--color-accent);
+  }
   
-  /* Screen reader only */
+  /* Layout utilities using tokens */
+  .container-padding {
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+  }
+
+  .section-padding {
+    padding-top: var(--section-padding);
+    padding-bottom: var(--section-padding);
+  }
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Touch target utilities */
+  .touch-target {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+    @apply flex items-center justify-center;
+  }
+
+  .touch-target-comfortable {
+    min-width: var(--touch-target-comfortable);
+    min-height: var(--touch-target-comfortable);
+    @apply flex items-center justify-center;
+  }
+
+  /* Accessibility utilities */
   .sr-only {
     @apply absolute w-px h-px p-0 -m-px overflow-hidden;
     clip: rect(0, 0, 0, 0);
@@ -185,25 +342,13 @@
     border: 0;
   }
 
-  /* Touch target optimization */
-  .touch-target {
-    @apply min-w-[44px] min-h-[44px] flex items-center justify-center;
+  .not-sr-only {
+    @apply static w-auto h-auto p-0 m-0 overflow-visible;
+    clip: auto;
+    white-space: normal;
   }
 
-  /* Text balance for better readability */
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Prevent text selection */
-  .select-disabled {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-  }
-
-  /* Performance optimizations */
+  /* Performance utilities */
   .content-auto {
     content-visibility: auto;
   }
@@ -217,19 +362,112 @@
     will-change: transform;
   }
   
-  /* Layout optimization */
   .layout-stable {
     contain: layout style;
   }
   
-  /* Render optimization */
   .render-optimized {
     will-change: auto;
     transform: translateZ(0);
   }
+
+  /* Theme utilities */
+  .theme-transition {
+    transition: color var(--duration-normal) var(--ease-formless),
+                background-color var(--duration-normal) var(--ease-formless),
+                border-color var(--duration-normal) var(--ease-formless),
+                box-shadow var(--duration-normal) var(--ease-formless);
+  }
+
+  /* Gradient utilities */
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--gradient-primary), var(--gradient-secondary));
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--gradient-primary), var(--gradient-tertiary));
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--gradient-primary), var(--gradient-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Z-index utilities */
+  .z-dropdown { z-index: var(--z-dropdown); }
+  .z-sticky { z-index: var(--z-sticky); }
+  .z-fixed { z-index: var(--z-fixed); }
+  .z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+  .z-modal { z-index: var(--z-modal); }
+  .z-popover { z-index: var(--z-popover); }
+  .z-tooltip { z-index: var(--z-tooltip); }
+  .z-toast { z-index: var(--z-toast); }
+
+  /* Prevent text selection */
+  .select-disabled {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
 }
 
-/* Animations */
+/* Enhanced keyframes */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Responsive token optimizations */
+@media (max-width: 374px) {
+  .container {
+    @apply px-3;
+  }
+  
+  .section {
+    @apply py-8;
+  }
+}
+
+@media (min-width: 375px) and (max-width: 767px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .section {
+    @apply py-12;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    @apply px-8;
+  }
+  
+  .section {
+    @apply py-20;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    @apply py-28;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    @apply px-12;
+  }
+  
+  .section {
+    @apply py-32;
+  }
+}
+
+/* Enhanced accessibility and performance */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -256,8 +494,8 @@
   }
 }
 
-/* Skip link for accessibility */
+/* Skip link enhancement */
 .skip-link {
-  @apply absolute top-0 left-0 bg-accent text-white px-4 py-2 z-50;
-  @apply -translate-y-full focus:translate-y-0 transition-transform;
+  @apply absolute top-0 left-0 bg-accent text-accent-ink px-4 py-2 z-toast;
+  @apply -translate-y-full focus:translate-y-0 transition-transform duration-normal ease-formless;
 }
