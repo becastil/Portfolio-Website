@@ -85,31 +85,41 @@ export default function Navigation() {
   return (
     <header 
       className={cn(
-        'sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border transition-all duration-300',
-        isScrolled && 'shadow-sm'
+        'sticky top-0 z-50 bg-[color:var(--panel)]/80 backdrop-blur-md border-b border-[color:var(--border)] transition-all duration-300',
+        isScrolled && 'bg-[color:var(--panel)]/90 shadow-sm'
       )}
+      data-scrolled={isScrolled}
       role="banner"
     >
       <div className="container">
         <nav className="flex items-center justify-between py-4 min-h-[4rem]">
           <Link 
             href="/" 
-            className="text-xl font-bold text-text-primary hover:text-accent-text transition-colors"
+            className="text-xl font-bold text-[color:var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] rounded transition-colors duration-200"
             aria-label="Ben Castillo - Home"
           >
             BC
           </Link>
           
           <div className="flex items-center gap-8">
-            <ul className="hidden md:flex items-center gap-8" role="navigation" aria-label="Main navigation">
+            <ul className="hidden md:flex items-center gap-4" role="navigation" aria-label="Main navigation">
               {navLinks.map(link => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="font-medium text-text-secondary hover:text-accent-text transition-colors py-2 px-4 rounded-md hover:bg-surface-hover"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.label === 'Contact' ? (
+                    <Link
+                      href={link.href}
+                      className="inline-flex items-center rounded-xl bg-[color:var(--accent)] text-[color:var(--accent-ink)] px-4 py-2 font-medium shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] focus-visible:ring-offset-2"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="font-medium text-[color:var(--muted)] hover:text-[color:var(--text)] px-3 py-2 rounded-md transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -120,7 +130,7 @@ export default function Navigation() {
             <button
               ref={mobileButtonRef}
               onClick={toggleMobileMenu}
-              className="md:hidden touch-target p-2 rounded-md text-text-secondary hover:text-accent-text hover:bg-surface-hover transition-colors"
+              className="md:hidden touch-target p-2 rounded-md text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]"
               aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
@@ -197,20 +207,38 @@ export default function Navigation() {
                           duration: 0.3
                         }}
                       >
-                        <Link
-                          ref={index === 0 ? firstMenuItemRef : undefined}
-                          href={link.href}
-                          onClick={closeMobileMenu}
-                          className={cn(
-                            "block w-full px-4 py-3 text-left font-medium text-text-secondary",
-                            "hover:text-accent-text hover:bg-surface-hover",
-                            "focus:text-accent-text focus:bg-surface-hover focus:outline-none focus:ring-2 focus:ring-accent-focus focus:ring-offset-2 focus:ring-offset-surface",
-                            "rounded-lg transition-colors duration-200",
-                            "touch-target"
-                          )}
-                        >
-                          {link.label}
-                        </Link>
+                        {link.label === 'Contact' ? (
+                          <Link
+                            ref={index === 0 ? firstMenuItemRef : undefined}
+                            href={link.href}
+                            onClick={closeMobileMenu}
+                            className={cn(
+                              "block w-full px-4 py-3 text-center font-medium",
+                              "bg-[color:var(--accent)] text-[color:var(--accent-ink)]",
+                              "hover:brightness-110",
+                              "focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
+                              "rounded-xl shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                              "touch-target"
+                            )}
+                          >
+                            {link.label}
+                          </Link>
+                        ) : (
+                          <Link
+                            ref={index === 0 ? firstMenuItemRef : undefined}
+                            href={link.href}
+                            onClick={closeMobileMenu}
+                            className={cn(
+                              "block w-full px-4 py-3 text-left font-medium text-[color:var(--muted)]",
+                              "hover:text-[color:var(--text)]",
+                              "focus:text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
+                              "rounded-lg transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                              "touch-target"
+                            )}
+                          >
+                            {link.label}
+                          </Link>
+                        )}
                       </motion.li>
                     ))}
                   </ul>
