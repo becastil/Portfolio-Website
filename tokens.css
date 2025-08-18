@@ -6,32 +6,37 @@ Anthropic-inspired design system with responsive scaling
 */
 
 :root {
-  /* Color System - Light Theme */
-  --color-text-primary: #000000;
-  --color-text-secondary: #666666;
-  --color-text-muted: #666666;
-  --color-background: #FFFFFF;
-  --color-background-subtle: #F8F8F8;
-  --color-border: #E5E5E5;
-  --color-accent: #CC7A5C;
-  --color-accent-hover: #D88A6C;
-  --color-accent-text: #CC7A5C;
-  --color-accent-focus: #B66A4C;
-  --color-surface: #F8F8F8;
-  --color-surface-hover: #F0F0F0;
-  --color-neutral-warm: #D4C7B8;
-  --color-error: #DC2626;
-  --color-success: #059669;
+  /* Formless-inspired Color System - Light Theme */
+  --color-text-primary: hsl(222 47% 10%);      /* Deep charcoal text */
+  --color-text-secondary: hsl(215 16% 46%);    /* Muted secondary text */
+  --color-text-muted: hsl(220 9% 65%);         /* Subtle muted text */
+  --color-background: hsl(0 0% 100%);          /* Pure white background */
+  --color-background-subtle: hsl(210 20% 98%); /* Subtle off-white */
+  --color-border: hsl(220 13% 85%);            /* Higher contrast light borders */
+  --color-accent: hsl(245 84% 60%);            /* Deep indigo primary */
+  --color-accent-hover: hsl(245 84% 65%);      /* Lighter indigo hover */
+  --color-accent-text: hsl(245 84% 60%);       /* Indigo text */
+  --color-accent-focus: hsl(245 84% 55%);      /* Darker indigo focus */
+  --color-surface: hsl(210 20% 98%);           /* Light surface */
+  --color-surface-hover: hsl(210 20% 96%);     /* Hover surface */
+  --color-neutral-warm: hsl(220 9% 65%);       /* Neutral warm tone */
+  --color-error: hsl(0 84% 60%);               /* Error red */
+  --color-success: hsl(142 76% 36%);           /* Success green */
   
-  /* Monochrome Panel System - Formless-inspired */
-  --bg: hsl(0 0% 100%);           /* pure light background */
-  --text: hsl(222 47% 10%);       /* near-black text */
-  --muted: hsl(215 16% 46%);      /* secondary text */
-  --panel: hsl(0 0% 100%);        /* neutral panel */
-  --panel-2: hsl(210 20% 98%);    /* subtle hover panel */
-  --border: hsl(220 13% 90%);     /* crisp 1px borders */
-  --accent: hsl(0 0% 12%);        /* deep neutral for CTA */
-  --accent-ink: hsl(0 0% 100%);   /* text on accent */
+  /* Formless Monochrome System - Light Mode */
+  --bg: hsl(0 0% 100%);                        /* Pure white background */
+  --text: hsl(222 47% 10%);                    /* Deep charcoal text */
+  --muted: hsl(215 16% 46%);                   /* Secondary text */
+  --panel: hsl(210 20% 98%);                   /* Light panel */
+  --panel-2: hsl(210 20% 96%);                 /* Subtle hover panel */
+  --border: hsl(220 13% 85%);                  /* Higher contrast borders */
+  --accent: hsl(245 84% 60%);                  /* Deep indigo CTA */
+  --accent-ink: hsl(0 0% 100%);                /* White text on accent */
+  
+  /* Gradient Accent Colors - Formless-inspired */
+  --gradient-primary: hsl(245 84% 60%);        /* Deep indigo */
+  --gradient-secondary: hsl(158 64% 52%);      /* Mint teal */
+  --gradient-tertiary: hsl(280 65% 60%);       /* Violet accent */
   
   /* Typography Scale - Responsive */
   --font-size-xs: 0.875rem;   /* 14px */
@@ -87,16 +92,16 @@ Anthropic-inspired design system with responsive scaling
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   
-  /* Border Radius Scale */
-  --radius-sm: 0.5rem;     /* 8px */
-  --radius-md: 0.75rem;    /* 12px */
-  --radius-lg: 1rem;       /* 16px */
-  --radius-xl: 1.25rem;    /* 20px */
+  /* Border Radius Scale - Formless-inspired */
+  --radius-sm: 0.75rem;    /* 12px - More generous */
+  --radius-md: 1rem;       /* 16px - Calm rounded corners */
+  --radius-lg: 1.25rem;    /* 20px - Spacious feel */
+  --radius-xl: 1.5rem;     /* 24px - Premium rounded */
   
-  /* Shadow System - Anthropic Subtle */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  /* Shadow System - Formless Subtle */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
   
   /* Micro-interaction Shadows */
   --shadow-hover-primary: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
@@ -137,48 +142,50 @@ Anthropic-inspired design system with responsive scaling
   --z-toast: 1080;
   
   /* Interactive Overlay Colors - Formless-inspired */
-  --overlay-blue: hsl(199 89% 68%);     /* Soft sky blue #60A5FA */
-  --overlay-green: hsl(160 60% 51%);    /* Soft teal green #34D399 */
-  --overlay-accent: hsl(280 65% 60%);   /* Subtle purple accent */
+  --overlay-blue: hsl(245 84% 60%);     /* Deep indigo primary */
+  --overlay-green: hsl(158 64% 52%);    /* Mint teal secondary */
+  --overlay-purple: hsl(245 84% 60%);   /* Deep indigo */
+  --overlay-violet: hsl(280 65% 60%);   /* Violet accent */
   
   /* Overlay opacity modifiers */
-  --overlay-opacity-rest: 0.3;
-  --overlay-opacity-hover: 0.5;
-  --overlay-blur-amount: 100px;
+  --overlay-opacity-rest: 0.15;
+  --overlay-opacity-hover: 0.25;
+  --overlay-blur-amount: 120px;
 }
 
 /* Dark Theme Tokens */
 [data-theme="dark"] {
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #CCCCCC;
-  --color-text-muted: #999999;
-  --color-background: #0D0D0D;
-  --color-background-subtle: #1A1A1A;
-  --color-border: #333333;
-  --color-accent: #CC7A5C;
-  --color-accent-hover: #D88A6C;
-  --color-accent-text: #E69B7B;
-  --color-accent-focus: #F0B59B;
-  --color-surface: #1A1A1A;
-  --color-surface-hover: #2A2A2A;
-  --color-neutral-warm: #4A453F;
-  --color-error: #EF4444;
-  --color-success: #10B981;
+  --color-text-primary: hsl(210 40% 98%);       /* Near-white text */
+  --color-text-secondary: hsl(217 15% 65%);     /* Muted secondary text */
+  --color-text-muted: hsl(220 9% 55%);          /* Subtle muted text */
+  --color-background: hsl(224 15% 8%);          /* Near-black background */
+  --color-background-subtle: hsl(224 14% 12%);  /* Subtle dark surface */
+  --color-border: hsl(224 10% 20%);             /* Higher contrast dark borders */
+  --color-accent: hsl(245 84% 60%);             /* Deep indigo primary */
+  --color-accent-hover: hsl(245 84% 65%);       /* Lighter indigo hover */
+  --color-accent-text: hsl(245 84% 60%);        /* Indigo text */
+  --color-accent-focus: hsl(245 84% 55%);       /* Darker indigo focus */
+  --color-surface: hsl(224 14% 12%);            /* Dark surface */
+  --color-surface-hover: hsl(224 14% 16%);      /* Hover surface */
+  --color-neutral-warm: hsl(220 9% 55%);        /* Neutral warm tone */
+  --color-error: hsl(0 84% 60%);                /* Error red */
+  --color-success: hsl(142 76% 36%);            /* Success green */
   
   /* Monochrome Panel System - Dark Mode */
-  --bg: hsl(224 15% 8%);          /* near-black background */
-  --text: hsl(210 40% 98%);       /* near-white text */
-  --muted: hsl(217 15% 65%);      /* secondary text */
-  --panel: hsl(224 14% 12%);      /* neutral panel */
-  --panel-2: hsl(224 14% 10%);    /* subtle hover panel */
-  --border: hsl(224 10% 24%);     /* crisp borders */
-  --accent: hsl(0 0% 88%);        /* light neutral for CTA on dark */
-  --accent-ink: hsl(234 50% 12%); /* dark ink on light accent */
+  --bg: hsl(224 15% 8%);          /* Near-black background */
+  --text: hsl(210 40% 98%);       /* Near-white text */
+  --muted: hsl(217 15% 65%);      /* Secondary text */
+  --panel: hsl(224 14% 12%);      /* Neutral panel */
+  --panel-2: hsl(224 14% 16%);    /* Subtle hover panel */
+  --border: hsl(224 10% 20%);     /* Higher contrast borders */
+  --accent: hsl(245 84% 60%);     /* Deep indigo CTA */
+  --accent-ink: hsl(0 0% 100%);   /* White text on accent */
   
   /* Interactive Overlay Colors - Dark Mode */
-  --overlay-blue: hsl(199 70% 50%);     /* Deeper blue for dark mode */
-  --overlay-green: hsl(160 50% 40%);    /* Deeper teal for dark mode */
-  --overlay-accent: hsl(280 50% 45%);   /* Deeper purple for dark mode */
+  --overlay-blue: hsl(245 84% 50%);     /* Deep indigo primary for dark mode */
+  --overlay-green: hsl(158 64% 42%);    /* Mint teal secondary for dark mode */
+  --overlay-purple: hsl(245 84% 50%);   /* Deep indigo for dark mode */
+  --overlay-violet: hsl(280 65% 50%);   /* Violet accent for dark mode */
   
   /* Adjusted opacity for dark mode */
   --overlay-opacity-rest: 0.2;

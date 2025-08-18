@@ -22,12 +22,21 @@ const config: Config = {
         // Border colors
         'border': 'var(--color-border)',
         
-        // Accent colors
+        // Accent colors - Formless-inspired deep indigo and mint teal
         'accent': {
           DEFAULT: 'var(--color-accent)',
           hover: 'var(--color-accent-hover)',
           text: 'var(--color-accent-text)',
           focus: 'var(--color-accent-focus)',
+          // Add secondary accent for gradients
+          secondary: 'hsl(158 64% 52%)', // Mint teal for gradients
+        },
+        
+        // Overlay gradient colors for interactive elements
+        'overlay': {
+          blue: 'var(--overlay-blue)',
+          green: 'var(--overlay-green)',
+          accent: 'var(--overlay-accent)',
         },
         
         // Surface colors
@@ -83,10 +92,10 @@ const config: Config = {
       },
       
       borderRadius: {
-        'sm': '0.5rem',
-        'md': '0.75rem',
-        'lg': '1rem',
-        'xl': '1.25rem',
+        'sm': '0.75rem',   // 12px - aligns with tokens.css --radius-small
+        'md': '1rem',      // 16px - aligns with tokens.css --radius-medium
+        'lg': '1.25rem',   // 20px - aligns with tokens.css --radius-large
+        'xl': '1.5rem',    // 24px - aligns with tokens.css --radius-xlarge
       },
       
       boxShadow: {
