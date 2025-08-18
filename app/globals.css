@@ -149,7 +149,7 @@
   .form-input {
     @apply w-full px-4 py-3 border border-border rounded-md bg-surface;
     @apply text-text-primary font-mono transition-all duration-normal ease-formless;
-    @apply focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10;
+    @apply focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent focus:ring-opacity-10;
     @apply min-h-touch placeholder:text-text-muted;
   }
 
@@ -220,21 +220,21 @@
   }
 
   .badge-accent {
-    @apply badge bg-accent/10 text-accent;
+    @apply badge bg-accent bg-opacity-10 text-accent;
   }
 
   .badge-success {
-    @apply badge bg-success/10 text-success;
+    @apply badge bg-success bg-opacity-10 text-success;
   }
 
   .badge-error {
-    @apply badge bg-error/10 text-error;
+    @apply badge bg-error bg-opacity-10 text-error;
   }
 
   /* Tech tag enhanced */
   .tech-tag {
     @apply badge transition-all duration-normal ease-formless;
-    @apply hover:bg-accent/10 hover:text-accent hover:scale-105;
+    @apply hover:bg-accent hover:bg-opacity-10 hover:text-accent hover:scale-105;
   }
 
   /* Loading states */
