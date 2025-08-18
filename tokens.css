@@ -142,9 +142,9 @@ Anthropic-inspired design system with responsive scaling
   --overlay-accent: hsl(280 65% 60%);   /* Subtle purple accent */
   
   /* Overlay opacity modifiers */
-  --overlay-opacity-rest: 0.15;
-  --overlay-opacity-hover: 0.25;
-  --overlay-blur-amount: 80px;
+  --overlay-opacity-rest: 0.3;
+  --overlay-opacity-hover: 0.5;
+  --overlay-blur-amount: 100px;
 }
 
 /* Dark Theme Tokens */
@@ -181,8 +181,8 @@ Anthropic-inspired design system with responsive scaling
   --overlay-accent: hsl(280 50% 45%);   /* Deeper purple for dark mode */
   
   /* Adjusted opacity for dark mode */
-  --overlay-opacity-rest: 0.08;
-  --overlay-opacity-hover: 0.15;
+  --overlay-opacity-rest: 0.2;
+  --overlay-opacity-hover: 0.35;
 }
 
 /* Responsive Token Adjustments */

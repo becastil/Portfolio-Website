@@ -88,11 +88,11 @@ export default function Hero() {
         className="absolute inset-0 opacity-[0.02] pointer-events-none"
         style={{
           background: 'radial-gradient(ellipse at top, var(--accent), transparent 60%)',
-          zIndex: 0
+          zIndex: 2
         }}
       />
       
-      <div className="mx-auto max-w-[66ch] px-4 sm:px-6 relative" style={{ zIndex: 2 }}>
+      <div className="mx-auto max-w-[66ch] px-4 sm:px-6 relative" style={{ zIndex: 3 }}>
         <motion.div
           variants={containerVariants}
           initial="hidden"

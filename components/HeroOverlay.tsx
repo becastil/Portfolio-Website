@@ -130,9 +130,34 @@ export default function HeroOverlay() {
     }
   }, [shouldReduceMotion])
   
-  // Don't render overlay if user prefers reduced motion
+  // Static fallback for reduced motion
   if (shouldReduceMotion) {
-    return null
+    return (
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1,
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(circle at 30% 40%, var(--overlay-blue), transparent 40%),
+              radial-gradient(circle at 70% 60%, var(--overlay-green), transparent 40%)
+            `,
+            filter: `blur(var(--overlay-blur-amount))`,
+            opacity: 0.15,
+          }}
+        />
+      </div>
+    )
   }
   
   return (
@@ -148,9 +173,34 @@ export default function HeroOverlay() {
         right: 0,
         bottom: 0,
         zIndex: 1,
-        pointerEvents: 'auto', // Container needs to capture mouse events
+        pointerEvents: 'none', // Don't block interactions with content
       }}
     >
+      {/* Container for mouse events */}
+      <div
+        className="absolute inset-0"
+        style={{
+          pointerEvents: 'auto',
+          zIndex: 0,
+        }}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect()
+          const x = ((e.clientX - rect.left) / rect.width) * 100
+          const y = ((e.clientY - rect.top) / rect.height) * 100
+          targetPosition.current = { x, y }
+        }}
+        onMouseEnter={() => {
+          setIsHovering(true)
+          if (!rafRef.current) {
+            rafRef.current = requestAnimationFrame(animate)
+          }
+        }}
+        onMouseLeave={() => {
+          setIsHovering(false)
+          targetPosition.current = { x: 50, y: 50 }
+        }}
+      />
+      
       {/* Blue gradient overlay */}
       <div
         className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
