@@ -3,6 +3,7 @@ import './globals.css'
 import { siteMetadata } from '@/lib/constants'
 import MotionProvider from '@/components/providers/MotionProvider'
 import PageTransition from '@/components/providers/PageTransition'
+import ThemeProvider from '@/components/providers/ThemeProvider'
 
 export const metadata: Metadata = {
   title: {
@@ -118,11 +119,13 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <MotionProvider>
-          <PageTransition>
-            {children}
-          </PageTransition>
-        </MotionProvider>
+        <ThemeProvider defaultTheme="system">
+          <MotionProvider>
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </MotionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

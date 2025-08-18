@@ -77,6 +77,7 @@ export default function Hero() {
 
   return (
     <section 
+      id="hero"
       className="relative bg-[var(--bg)] text-[var(--text)] py-24 sm:py-32 overflow-hidden" 
       aria-labelledby="hero-heading"
     >

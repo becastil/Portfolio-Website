@@ -1,0 +1,173 @@
+name: Accessibility Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Start application
+      run: npm start &
+      env:
+        NODE_ENV: production
+        
+    - name: Wait for application to start
+      run: |
+        timeout 60s bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+        
+    - name: Install accessibility testing tools
+      run: |
+        npm install -g @axe-core/cli pa11y lighthouse
+        
+    - name: Run axe-core accessibility scan
+      run: |
+        npx @axe-core/cli http://localhost:3000 \
+          --rules-to-exclude color-contrast \
+          --fail-on-violation critical,serious \
+          --save accessibility-axe-report.json
+          
+    - name: Run Pa11y accessibility test
+      run: |
+        pa11y http://localhost:3000 \
+          --standard WCAG2AA \
+          --reporter json > accessibility-pa11y-report.json
+          
+    - name: Run Lighthouse accessibility audit
+      run: |
+        lighthouse http://localhost:3000 \
+          --only-categories=accessibility \
+          --output=json \
+          --output-path=accessibility-lighthouse-report.json \
+          --chrome-flags="--headless --no-sandbox"
+          
+    - name: Check Lighthouse accessibility score
+      run: |
+        node -e "
+          const report = require('./accessibility-lighthouse-report.json');
+          const score = report.lhr.categories.accessibility.score * 100;
+          console.log('Accessibility Score:', score);
+          if (score < 95) {
+            console.error('Accessibility score is below 95:', score);
+            process.exit(1);
+          }
+        "
+        
+    - name: Test multiple pages
+      run: |
+        # Test blog pages if they exist
+        if curl -f http://localhost:3000/blog; then
+          npx @axe-core/cli http://localhost:3000/blog --fail-on-violation critical,serious
+        fi
+        
+    - name: Upload accessibility reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: accessibility-reports
+        path: |
+          accessibility-*.json
+          
+    - name: Comment PR with results (if PR)
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Read Lighthouse report
+          let lighthouseScore = 'N/A';
+          try {
+            const lighthouse = JSON.parse(fs.readFileSync('accessibility-lighthouse-report.json', 'utf8'));
+            lighthouseScore = Math.round(lighthouse.lhr.categories.accessibility.score * 100);
+          } catch (e) {
+            console.log('Could not read Lighthouse report');
+          }
+          
+          // Read axe violations
+          let axeViolations = 'N/A';
+          try {
+            const axe = JSON.parse(fs.readFileSync('accessibility-axe-report.json', 'utf8'));
+            const violations = axe.violations || [];
+            const critical = violations.filter(v => v.impact === 'critical').length;
+            const serious = violations.filter(v => v.impact === 'serious').length;
+            axeViolations = `${critical} critical, ${serious} serious`;
+          } catch (e) {
+            console.log('Could not read axe report');
+          }
+          
+          const comment = `## 🔍 Accessibility Test Results
+          
+          | Test | Result |
+          |------|--------|
+          | Lighthouse Score | ${lighthouseScore}/100 |
+          | axe-core Violations | ${axeViolations} |
+          
+          ${lighthouseScore >= 95 ? '✅' : '❌'} Lighthouse accessibility score
+          ${axeViolations === '0 critical, 0 serious' ? '✅' : '❌'} No critical/serious violations
+          
+          📊 [View detailed reports in artifacts](${context.payload.pull_request.html_url}/checks)
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  visual-regression:
+    runs-on: ubuntu-latest
+    needs: accessibility
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright
+      run: npx playwright install
+      
+    - name: Build and start application
+      run: |
+        npm run build
+        npm start &
+        timeout 60s bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
+        
+    - name: Run accessibility-focused Playwright tests
+      run: |
+        npx playwright test tests/accessibility/ --reporter=html
+        
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-accessibility-report
+        path: playwright-report/

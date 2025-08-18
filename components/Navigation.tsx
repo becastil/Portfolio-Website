@@ -10,28 +10,111 @@ import ThemeToggle from './ThemeToggle'
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
+  const [lastAnnouncedSection, setLastAnnouncedSection] = useState('')
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const mobileButtonRef = useRef<HTMLButtonElement>(null)
   const firstMenuItemRef = useRef<HTMLAnchorElement>(null)
+  const statusRef = useRef<HTMLDivElement>(null)
 
-  // Handle scroll state
+  // Enhanced scroll state and active section detection
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    // Intersection Observer for active section detection
+    const observerOptions = {
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0.1
+    }
 
-  // Handle mobile menu interactions
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id
+          setActiveSection(sectionId)
+          
+          // Announce section changes for screen readers (with throttling)
+          if (sectionId !== lastAnnouncedSection && sectionId) {
+            setLastAnnouncedSection(sectionId)
+            if (statusRef.current) {
+              const sectionName = sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
+              statusRef.current.textContent = `Now viewing ${sectionName} section`
+            }
+          }
+        }
+      })
+    }, observerOptions)
+
+    // Observe sections
+    const sections = ['hero', 'about', 'projects', 'contact']
+    sections.forEach(id => {
+      const element = document.getElementById(id)
+      if (element) observer.observe(element)
+    })
+
+    window.addEventListener('scroll', handleScroll)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      observer.disconnect()
+    }
+  }, [lastAnnouncedSection])
+
+  // Handle mobile menu interactions with accessibility announcements
   const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(prev => !prev)
+    setIsMobileMenuOpen(prev => {
+      const newState = !prev
+      // Announce menu state change
+      if (statusRef.current) {
+        statusRef.current.textContent = newState ? 'Mobile menu opened' : 'Mobile menu closed'
+      }
+      return newState
+    })
   }, [])
 
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false)
+    if (statusRef.current) {
+      statusRef.current.textContent = 'Mobile menu closed'
+    }
   }, [])
+
+  // Enhanced smooth scrolling with focus management
+  const handleSmoothScroll = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault()
+    
+    const targetId = href.replace('#', '')
+    const targetElement = document.getElementById(targetId)
+    
+    if (targetElement) {
+      // Close mobile menu first
+      if (isMobileMenuOpen) {
+        closeMobileMenu()
+      }
+      
+      // Smooth scroll with focus management
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+      
+      // Set focus after scroll completes (with delay for smooth scroll)
+      setTimeout(() => {
+        // Try to focus the first focusable element in the target section
+        const focusTarget = targetElement.querySelector('h1, h2, h3, [tabindex="0"], button, [href]') as HTMLElement
+        if (focusTarget) {
+          focusTarget.focus()
+        } else {
+          // Fallback: make the section itself focusable and focus it
+          targetElement.setAttribute('tabindex', '-1')
+          targetElement.focus()
+          targetElement.style.outline = 'none'
+        }
+      }, 650) // Slightly longer than typical smooth scroll duration
+    }
+  }, [isMobileMenuOpen, closeMobileMenu])
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -103,25 +186,47 @@ export default function Navigation() {
           
           <div className="flex items-center gap-8">
             <ul className="hidden md:flex items-center gap-4" role="navigation" aria-label="Main navigation">
-              {navLinks.map(link => (
-                <li key={link.href}>
-                  {link.label === 'Contact' ? (
-                    <Link
-                      href={link.href}
-                      className="inline-flex items-center rounded-xl bg-[color:var(--accent)] text-[color:var(--accent-ink)] px-4 py-2 font-medium shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] focus-visible:ring-offset-2"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <Link
-                      href={link.href}
-                      className="font-medium text-[color:var(--muted)] hover:text-[color:var(--text)] px-3 py-2 rounded-md transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
+              {navLinks.map(link => {
+                const isActive = activeSection === link.href.replace('#', '')
+                return (
+                  <li key={link.href}>
+                    {link.label === 'Contact' ? (
+                      <Link
+                        href={link.href}
+                        onClick={(e) => handleSmoothScroll(e, link.href)}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(
+                          "inline-flex items-center rounded-xl px-4 py-2 font-medium shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)] focus-visible:ring-offset-2",
+                          isActive 
+                            ? "bg-[color:var(--accent)] text-[color:var(--accent-ink)] ring-2 ring-[color:var(--accent)]/20"
+                            : "bg-[color:var(--accent)] text-[color:var(--accent-ink)] hover:brightness-110"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        onClick={(e) => handleSmoothScroll(e, link.href)}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(
+                          "font-medium px-3 py-2 rounded-md transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]",
+                          isActive
+                            ? "text-[color:var(--accent)] bg-[color:var(--surface)] shadow-sm"
+                            : "text-[color:var(--muted)] hover:text-[color:var(--text)]"
+                        )}
+                      >
+                        {link.label}
+                        {isActive && (
+                          <span className="sr-only"> (current section)</span>
+                        )}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
             
             <ThemeToggle />
@@ -197,50 +302,70 @@ export default function Navigation() {
               <div className="p-6">
                 <nav role="navigation" aria-label="Mobile navigation">
                   <ul className="space-y-1">
-                    {navLinks.map((link, index) => (
-                      <motion.li
-                        key={link.href}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ 
-                          delay: index * 0.1,
-                          duration: 0.3
-                        }}
-                      >
-                        {link.label === 'Contact' ? (
-                          <Link
-                            ref={index === 0 ? firstMenuItemRef : undefined}
-                            href={link.href}
-                            onClick={closeMobileMenu}
-                            className={cn(
-                              "block w-full px-4 py-3 text-center font-medium",
-                              "bg-[color:var(--accent)] text-[color:var(--accent-ink)]",
-                              "hover:brightness-110",
-                              "focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
-                              "rounded-xl shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
-                              "touch-target"
-                            )}
-                          >
-                            {link.label}
-                          </Link>
-                        ) : (
-                          <Link
-                            ref={index === 0 ? firstMenuItemRef : undefined}
-                            href={link.href}
-                            onClick={closeMobileMenu}
-                            className={cn(
-                              "block w-full px-4 py-3 text-left font-medium text-[color:var(--muted)]",
-                              "hover:text-[color:var(--text)]",
-                              "focus:text-[color:var(--text)] focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
-                              "rounded-lg transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
-                              "touch-target"
-                            )}
-                          >
-                            {link.label}
-                          </Link>
-                        )}
-                      </motion.li>
-                    ))}
+                    {navLinks.map((link, index) => {
+                      const isActive = activeSection === link.href.replace('#', '')
+                      return (
+                        <motion.li
+                          key={link.href}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ 
+                            delay: index * 0.1,
+                            duration: 0.3
+                          }}
+                        >
+                          {link.label === 'Contact' ? (
+                            <Link
+                              ref={index === 0 ? firstMenuItemRef : undefined}
+                              href={link.href}
+                              onClick={(e) => {
+                                handleSmoothScroll(e, link.href)
+                                closeMobileMenu()
+                              }}
+                              aria-current={isActive ? 'page' : undefined}
+                              className={cn(
+                                "block w-full px-4 py-3 text-center font-medium",
+                                "rounded-xl shadow-sm transition duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                                "focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
+                                "touch-target",
+                                isActive 
+                                  ? "bg-[color:var(--accent)] text-[color:var(--accent-ink)] ring-2 ring-[color:var(--accent)]/20"
+                                  : "bg-[color:var(--accent)] text-[color:var(--accent-ink)] hover:brightness-110"
+                              )}
+                            >
+                              {link.label}
+                              {isActive && (
+                                <span className="sr-only"> (current section)</span>
+                              )}
+                            </Link>
+                          ) : (
+                            <Link
+                              ref={index === 0 ? firstMenuItemRef : undefined}
+                              href={link.href}
+                              onClick={(e) => {
+                                handleSmoothScroll(e, link.href)
+                                closeMobileMenu()
+                              }}
+                              aria-current={isActive ? 'page' : undefined}
+                              className={cn(
+                                "block w-full px-4 py-3 text-left font-medium",
+                                "rounded-lg transition-colors duration-200 ease-[cubic-bezier(.2,.6,0,1)]",
+                                "focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:ring-offset-2 focus:ring-offset-surface",
+                                "touch-target",
+                                isActive
+                                  ? "text-[color:var(--accent)] bg-[color:var(--surface)] shadow-sm"
+                                  : "text-[color:var(--muted)] hover:text-[color:var(--text)]"
+                              )}
+                            >
+                              {link.label}
+                              {isActive && (
+                                <span className="sr-only"> (current section)</span>
+                              )}
+                            </Link>
+                          )}
+                        </motion.li>
+                      )
+                    })}
                   </ul>
                   
                   {/* Mobile theme toggle */}
@@ -266,6 +391,15 @@ export default function Navigation() {
           </>
         )}
       </AnimatePresence>
+      
+      {/* ARIA live region for accessibility announcements */}
+      <div
+        ref={statusRef}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+        role="status"
+      />
     </header>
   )
 }

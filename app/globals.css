@@ -79,11 +79,31 @@
     @apply font-mono font-medium theme-transition;
   }
 
-  /* Enhanced focus states using tokens */
+  /* Enhanced focus states using tokens with proper contrast */
   *:focus-visible {
     @apply outline-2 outline-offset-2;
-    outline-color: var(--color-accent-focus);
+    outline-color: var(--color-accent);
     outline-style: solid;
+    /* Ensure focus ring is never clipped */
+    outline-offset: 2px;
+    /* Fallback for browsers that don't support :focus-visible */
+    box-shadow: 0 0 0 2px var(--color-accent);
+  }
+
+  /* Enhanced focus ring for critical navigation elements */
+  .focus-ring-enhanced:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px var(--color-accent), 0 0 0 6px rgba(255, 255, 255, 0.8);
+  }
+
+  /* High contrast focus rings */
+  @media (prefers-contrast: high) {
+    *:focus-visible {
+      outline-width: 3px;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 3px var(--color-accent), 0 0 0 6px var(--color-background);
+    }
   }
 }
 
@@ -480,6 +500,28 @@
   html {
     scroll-behavior: auto;
   }
+  
+  /* Preserve essential visual feedback */
+  .skip-link:focus,
+  *:focus-visible {
+    transition: none;
+  }
+  
+  /* Keep hover states for usability */
+  .btn:hover,
+  .nav-link:hover {
+    transition: none;
+  }
+  
+  /* Disable complex animations but keep simple state changes */
+  .nav-link-active-indicator::after {
+    transition: none;
+  }
+  
+  .loading-shimmer {
+    animation: none;
+    background: var(--color-surface);
+  }
 }
 
 /* High contrast mode support */
@@ -492,10 +534,202 @@
   [data-theme="dark"] {
     --color-border: #ffffff;
   }
+  
+  /* Enhanced focus rings for high contrast */
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px var(--color-accent), 0 0 0 6px var(--color-background);
+  }
+  
+  .skip-link {
+    border-width: 3px;
+    font-weight: bold;
+  }
+  
+  .nav-link-active-indicator.active::after {
+    width: 6px;
+    height: 6px;
+    border: 2px solid var(--color-background);
+  }
+  
+  /* Ensure all interactive elements have clear borders */
+  .btn,
+  .nav-link,
+  .form-input {
+    border: 2px solid currentColor;
+  }
+  
+  /* Enhanced shadows for better depth perception */
+  .card,
+  .mobile-menu {
+    box-shadow: 0 0 0 2px var(--color-border), 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Make sure text has maximum contrast */
+  .text-contrast-enhanced {
+    color: var(--color-text-primary);
+    background: var(--color-background);
+    font-weight: 500;
+  }
 }
 
-/* Skip link enhancement */
+/* Large text and zoom support */
+@media (min-resolution: 192dpi) {
+  /* Higher DPI displays - ensure crisp focus rings */
+  *:focus-visible {
+    outline-width: 2px;
+  }
+}
+
+@media (prefers-reduced-data: reduce) {
+  /* Reduce animation complexity for low-bandwidth scenarios */
+  .loading-shimmer {
+    animation: none;
+    background: var(--color-surface);
+  }
+  
+  /* Disable complex animations */
+  .hover-lift:hover,
+  .hover-scale:hover,
+  .hover-glow:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Enhanced skip link with better contrast and positioning */
 .skip-link {
-  @apply absolute top-0 left-0 bg-accent text-accent-ink px-4 py-2 z-toast;
+  @apply absolute top-0 left-0 bg-accent text-accent-ink px-6 py-3 z-toast;
   @apply -translate-y-full focus:translate-y-0 transition-transform duration-normal ease-formless;
+  @apply font-medium rounded-br-md shadow-lg;
+  /* Ensure skip link has sufficient contrast */
+  background: var(--color-accent);
+  color: var(--color-background);
+  border: 2px solid var(--color-background);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  /* Enhanced focus for skip links */
+  outline: 3px solid var(--color-background);
+  outline-offset: 2px;
+}
+
+/* Enhanced navigation active states */
+.nav-link-active-indicator {
+  position: relative;
+}
+
+.nav-link-active-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-formless);
+}
+
+.nav-link-active-indicator.active::after {
+  opacity: 1;
+}
+
+/* Enhanced mobile menu accessibility */
+.mobile-menu-backdrop {
+  @apply fixed inset-0 bg-background/80 backdrop-blur-sm z-modal-backdrop;
+  /* Prevent interaction with background content */
+  touch-action: none;
+}
+
+/* Focus trap styles */
+.focus-trap {
+  position: relative;
+}
+
+.focus-trap-active {
+  /* Ensure focus stays within the trap */
+  contain: layout style;
+}
+
+/* Enhanced form accessibility */
+.form-field-error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+.form-field-error:focus {
+  outline-color: var(--color-error);
+  box-shadow: 0 0 0 2px var(--color-error);
+}
+
+/* Required field indicators */
+.form-label-required::after {
+  content: ' *';
+  color: var(--color-error);
+  font-weight: bold;
+}
+
+/* Status and live region styling */
+.status-message {
+  @apply sr-only;
+  /* Ensure screen readers announce status changes */
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.status-message-visible {
+  @apply not-sr-only;
+  @apply fixed top-4 right-4 bg-accent text-accent-ink px-4 py-2 rounded-md shadow-lg z-toast;
+  /* Temporary visible status messages */
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Enhanced touch targets for accessibility */
+.touch-target-enhanced {
+  min-width: 48px;
+  min-height: 48px;
+  @apply flex items-center justify-center;
+  /* Ensure touch targets don't overlap */
+  margin: 2px;
+}
+
+/* Better color contrast utilities */
+.text-contrast-enhanced {
+  /* Ensure text meets WCAG AA contrast ratios */
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+.text-contrast-enhanced-large {
+  /* For large text (18pt+) that needs 3:1 contrast */
+  color: var(--color-text-secondary);
+}
+
+/* Screen reader only content that becomes visible on focus */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  @apply not-sr-only;
+  @apply absolute top-0 left-0 bg-background text-text-primary p-2 z-toast;
 }

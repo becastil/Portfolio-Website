@@ -2,66 +2,81 @@
 
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/components/providers/ThemeProvider'
+import { Moon, Sun, Monitor } from 'lucide-react'
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [mounted, setMounted] = useState(false)
+  const { theme, resolvedTheme, setTheme } = useTheme()
 
   useEffect(() => {
     setMounted(true)
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light')
-    
-    setTheme(initialTheme)
-    document.documentElement.setAttribute('data-theme', initialTheme)
   }, [])
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
-    document.documentElement.setAttribute('data-theme', newTheme)
-  }
 
   if (!mounted) {
     return (
-      <div className="w-[44px] h-[44px] rounded-md border border-border" />
+      <div className="w-[44px] h-[44px] rounded-md border border-border" aria-hidden="true" />
     )
+  }
+
+  const cycleTheme = () => {
+    const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system']
+    const currentIndex = themes.indexOf(theme)
+    const nextIndex = (currentIndex + 1) % themes.length
+    setTheme(themes[nextIndex])
+  }
+
+  const getThemeLabel = () => {
+    switch (theme) {
+      case 'light':
+        return 'Light mode'
+      case 'dark':
+        return 'Dark mode'
+      case 'system':
+        return `System (${resolvedTheme} mode)`
+      default:
+        return 'Toggle theme'
+    }
+  }
+
+  const getNextThemeLabel = () => {
+    switch (theme) {
+      case 'light':
+        return 'Switch to dark mode'
+      case 'dark':
+        return 'Switch to system theme'
+      case 'system':
+        return 'Switch to light mode'
+      default:
+        return 'Toggle theme'
+    }
   }
 
   return (
     <button
       type="button"
-      onClick={toggleTheme}
-      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-      aria-pressed={theme === 'dark'}
+      onClick={cycleTheme}
+      aria-label={getNextThemeLabel()}
+      aria-pressed={resolvedTheme === 'dark'}
       className={cn(
         'touch-target rounded-md border border-border',
         'hover:bg-surface-hover hover:border-accent transition-all duration-300',
         'flex items-center justify-center gap-2 px-3',
-        theme === 'dark' && 'bg-accent text-white border-accent'
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        resolvedTheme === 'dark' && 'bg-surface-hover'
       )}
     >
-      {theme === 'light' ? (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-      ) : (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-      )}
+      <span className="relative w-4 h-4 flex items-center justify-center">
+        {theme === 'light' ? (
+          <Sun className="w-4 h-4" aria-hidden="true" />
+        ) : theme === 'dark' ? (
+          <Moon className="w-4 h-4" aria-hidden="true" />
+        ) : (
+          <Monitor className="w-4 h-4" aria-hidden="true" />
+        )}
+      </span>
       <span className="hidden md:inline text-sm font-medium">
-        {theme === 'light' ? 'Dark' : 'Light'}
+        {getThemeLabel()}
       </span>
     </button>
   )
