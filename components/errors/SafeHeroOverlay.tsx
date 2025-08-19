@@ -154,11 +154,11 @@ async function reportError(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...errorDetails,
-        url: window.location.href,
+        url: typeof window !== 'undefined' ? window.location.href : '',
         timestamp: new Date().toISOString(),
         viewport: {
-          width: window.innerWidth,
-          height: window.innerHeight
+          width: typeof window !== 'undefined' ? window.innerWidth : 0,
+          height: typeof window !== 'undefined' ? window.innerHeight : 0
         }
       })
     });

@@ -628,6 +628,17 @@ const INTENSITY_MULTIPLIERS = {
  * ```
  */
 function detectDeviceCapabilities(): DeviceCapabilities {
+  // Return safe defaults for SSR
+  if (typeof window === 'undefined') {
+    return {
+      hasTouch: false,
+      pixelRatio: 1,
+      isLowEnd: false,
+      gpuTier: 2,
+      cpuCores: 4
+    };
+  }
+  
   const hasTouch = 'ontouchstart' in window;
   const pixelRatio = window.devicePixelRatio || 1;
   const cpuCores = navigator.hardwareConcurrency || 4;
@@ -702,6 +713,10 @@ function createParticle(
  * ```
  */
 function prefersReducedMotion(): boolean {
+  // Return false for SSR
+  if (typeof window === 'undefined') {
+    return false;
+  }
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
@@ -817,7 +832,7 @@ export default function HeroOverlay({
   const [currentPerformanceMode, setCurrentPerformanceMode] = useState(performanceMode);
   
   /** Device capabilities detected on mount */
-  const [deviceCapabilities] = useState(detectDeviceCapabilities);
+  const [deviceCapabilities] = useState(() => detectDeviceCapabilities());
   
   /**
    * Configuration Merging
@@ -887,8 +902,10 @@ export default function HeroOverlay({
     if (!ctx) return;
     
     // Set canvas size
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 0;
+    
+    if (width === 0 || height === 0) return;
     
     canvas.width = width * deviceCapabilities.pixelRatio;
     canvas.height = height * deviceCapabilities.pixelRatio;
