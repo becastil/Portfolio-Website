@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 interface Position {
@@ -8,18 +8,29 @@ interface Position {
   y: number
 }
 
+// Performance constants
+const LERP_FACTOR = 0.08 // Smooth interpolation factor
+const UPDATE_THRESHOLD = 0.01 // Minimum change to trigger update
+const GRADIENT_SIZE_LARGE = 600
+const GRADIENT_SIZE_MEDIUM = 500
+const GRADIENT_SIZE_SMALL = 400
+
 export default function HeroOverlay() {
   const containerRef = useRef<HTMLDivElement>(null)
   const rafRef = useRef<number | null>(null)
   const shouldReduceMotion = useReducedMotion()
   
   // Track mouse/touch position
-  const [mousePosition, setMousePosition] = useState<Position>({ x: 0, y: 0 })
+  const [mousePosition, setMousePosition] = useState<Position>({ x: 50, y: 50 })
   const [isHovering, setIsHovering] = useState(false)
   
   // Smooth position tracking with requestAnimationFrame
-  const targetPosition = useRef<Position>({ x: 0, y: 0 })
-  const currentPosition = useRef<Position>({ x: 0, y: 0 })
+  const targetPosition = useRef<Position>({ x: 50, y: 50 })
+  const currentPosition = useRef<Position>({ x: 50, y: 50 })
+  
+  // Performance tracking (development only)
+  const lastFrameTime = useRef<number>(0)
+  const frameCount = useRef<number>(0)
   
   // Lerp function for smooth animation
   const lerp = (start: number, end: number, factor: number) => {
@@ -27,27 +38,37 @@ export default function HeroOverlay() {
   }
   
   // Animation loop with performance optimization
-  const animate = () => {
+  const animate = useCallback(() => {
     if (shouldReduceMotion) return
     
-    // Smooth interpolation - adjust factor for different smoothness
-    const lerpFactor = 0.08 // Slightly slower for smoother motion
+    // Performance tracking in development
+    if (process.env.NODE_ENV === 'development') {
+      frameCount.current++
+      const now = performance.now()
+      if (now - lastFrameTime.current >= 1000) {
+        // Log FPS every second in development
+        console.debug(`HeroOverlay FPS: ${frameCount.current}`)
+        frameCount.current = 0
+        lastFrameTime.current = now
+      }
+    }
+    
+    // Smooth interpolation
     const newX = lerp(
       currentPosition.current.x,
       targetPosition.current.x,
-      lerpFactor
+      LERP_FACTOR
     )
     const newY = lerp(
       currentPosition.current.y,
       targetPosition.current.y,
-      lerpFactor
+      LERP_FACTOR
     )
     
     // Only update if there's meaningful change (performance optimization)
-    const threshold = 0.01
     if (
-      Math.abs(newX - currentPosition.current.x) > threshold ||
-      Math.abs(newY - currentPosition.current.y) > threshold
+      Math.abs(newX - currentPosition.current.x) > UPDATE_THRESHOLD ||
+      Math.abs(newY - currentPosition.current.y) > UPDATE_THRESHOLD
     ) {
       currentPosition.current.x = newX
       currentPosition.current.y = newY
@@ -59,76 +80,65 @@ export default function HeroOverlay() {
     }
     
     rafRef.current = requestAnimationFrame(animate)
-  }
+  }, [shouldReduceMotion])
+  
+  // Handle pointer movement (works for both mouse and touch)
+  const handlePointerMove = useCallback((clientX: number, clientY: number) => {
+    if (!containerRef.current || shouldReduceMotion) return
+    
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = ((clientX - rect.left) / rect.width) * 100
+    const y = ((clientY - rect.top) / rect.height) * 100
+    
+    // Clamp values between 0 and 100
+    targetPosition.current = { 
+      x: Math.max(0, Math.min(100, x)), 
+      y: Math.max(0, Math.min(100, y)) 
+    }
+  }, [shouldReduceMotion])
   
   // Handle mouse movement
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!containerRef.current || shouldReduceMotion) return
-    
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-    
-    targetPosition.current = { x, y }
-  }
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    handlePointerMove(e.clientX, e.clientY)
+  }, [handlePointerMove])
   
   // Handle touch movement (mobile support)
-  const handleTouchMove = (e: TouchEvent) => {
-    if (!containerRef.current || shouldReduceMotion) return
-    
-    const touch = e.touches[0]
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = ((touch.clientX - rect.left) / rect.width) * 100
-    const y = ((touch.clientY - rect.top) / rect.height) * 100
-    
-    targetPosition.current = { x, y }
-  }
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0]
+      handlePointerMove(touch.clientX, touch.clientY)
+    }
+  }, [handlePointerMove])
   
   // Handle mouse enter/leave for visibility control
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     setIsHovering(true)
     if (!rafRef.current && !shouldReduceMotion) {
       rafRef.current = requestAnimationFrame(animate)
     }
-  }
+  }, [animate, shouldReduceMotion])
   
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsHovering(false)
-    // Optionally keep animation running for smooth fade-out
-    // Or center the gradients when not hovering
+    // Return to center when not hovering
     targetPosition.current = { x: 50, y: 50 }
-  }
+  }, [])
   
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-    
-    // Set initial position to center
-    targetPosition.current = { x: 50, y: 50 }
-    currentPosition.current = { x: 50, y: 50 }
-    
-    // Add event listeners
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('touchmove', handleTouchMove)
-    container.addEventListener('mouseenter', handleMouseEnter)
-    container.addEventListener('mouseleave', handleMouseLeave)
-    
     // Start animation loop if not reducing motion
-    if (!shouldReduceMotion) {
+    if (!shouldReduceMotion && !rafRef.current) {
       rafRef.current = requestAnimationFrame(animate)
+      lastFrameTime.current = performance.now()
     }
     
     return () => {
-      // Cleanup
+      // Cleanup animation frame
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
       }
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('touchmove', handleTouchMove)
-      container.removeEventListener('mouseenter', handleMouseEnter)
-      container.removeEventListener('mouseleave', handleMouseLeave)
     }
-  }, [shouldReduceMotion])
+  }, [shouldReduceMotion, animate])
   
   // Static fallback for reduced motion
   if (shouldReduceMotion) {
@@ -152,8 +162,8 @@ export default function HeroOverlay() {
               radial-gradient(circle at 30% 40%, var(--overlay-blue), transparent 40%),
               radial-gradient(circle at 70% 60%, var(--overlay-green), transparent 40%)
             `,
-            filter: `blur(var(--overlay-blur-amount))`,
-            opacity: 0.15,
+            filter: 'blur(var(--overlay-blur-amount))',
+            opacity: 'var(--overlay-opacity-rest)',
           }}
         />
       </div>
@@ -165,6 +175,12 @@ export default function HeroOverlay() {
       ref={containerRef}
       className="absolute inset-0 overflow-hidden"
       aria-hidden="true"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove}
+      onTouchStart={handleMouseEnter}
+      onTouchEnd={handleMouseLeave}
       style={{
         // Ensure overlay is positioned correctly
         position: 'absolute',
@@ -173,84 +189,67 @@ export default function HeroOverlay() {
         right: 0,
         bottom: 0,
         zIndex: 1,
-        pointerEvents: 'none', // Don't block interactions with content
+        // Use contain for performance
+        contain: 'paint layout',
       }}
     >
-      {/* Container for mouse events */}
-      <div
-        className="absolute inset-0"
-        style={{
-          pointerEvents: 'auto',
-          zIndex: 0,
-        }}
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          const x = ((e.clientX - rect.left) / rect.width) * 100
-          const y = ((e.clientY - rect.top) / rect.height) * 100
-          targetPosition.current = { x, y }
-        }}
-        onMouseEnter={() => {
-          setIsHovering(true)
-          if (!rafRef.current) {
-            rafRef.current = requestAnimationFrame(animate)
-          }
-        }}
-        onMouseLeave={() => {
-          setIsHovering(false)
-          targetPosition.current = { x: 50, y: 50 }
-        }}
-      />
       
       {/* Blue gradient overlay */}
       <div
-        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          background: `radial-gradient(circle at center, var(--overlay-blue), transparent 60%)`,
-          filter: `blur(var(--overlay-blur-amount))`,
-          opacity: isHovering ? `var(--overlay-opacity-hover)` : `var(--overlay-opacity-rest)`,
-          transform: `translate(-50%, -50%)`,
+          width: `${GRADIENT_SIZE_LARGE}px`,
+          height: `${GRADIENT_SIZE_LARGE}px`,
+          background: 'radial-gradient(circle at center, var(--overlay-blue), transparent 60%)',
+          filter: 'blur(var(--overlay-blur-amount))',
+          opacity: isHovering ? 'var(--overlay-opacity-hover)' : 'var(--overlay-opacity-rest)',
+          transform: 'translate(-50%, -50%)',
           left: `${mousePosition.x}%`,
           top: `${mousePosition.y}%`,
           transition: 'opacity var(--duration-slow) var(--ease-out-expo)',
           willChange: 'transform, opacity',
-          mixBlendMode: 'screen',
+          mixBlendMode: 'var(--overlay-blend-mode-primary, screen)',
         }}
       />
       
       {/* Green gradient overlay - offset for depth */}
       <div
-        className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          background: `radial-gradient(circle at center, var(--overlay-green), transparent 65%)`,
-          filter: `blur(calc(var(--overlay-blur-amount) * 0.75))`,
+          width: `${GRADIENT_SIZE_MEDIUM}px`,
+          height: `${GRADIENT_SIZE_MEDIUM}px`,
+          background: 'radial-gradient(circle at center, var(--overlay-green), transparent 65%)',
+          filter: 'blur(calc(var(--overlay-blur-amount) * 0.75))',
           opacity: isHovering 
-            ? `calc(var(--overlay-opacity-hover) * 0.8)` 
-            : `calc(var(--overlay-opacity-rest) * 0.8)`,
-          transform: `translate(-50%, -50%)`,
+            ? 'calc(var(--overlay-opacity-hover) * 0.8)' 
+            : 'calc(var(--overlay-opacity-rest) * 0.8)',
+          transform: 'translate(-50%, -50%)',
           // Offset the green gradient slightly for a more dynamic effect
           left: `${mousePosition.x + 10}%`,
           top: `${mousePosition.y - 10}%`,
           transition: 'opacity var(--duration-slow) var(--ease-out-expo)',
           willChange: 'transform, opacity',
-          mixBlendMode: 'screen',
+          mixBlendMode: 'var(--overlay-blend-mode-secondary, screen)',
         }}
       />
       
       {/* Additional subtle accent gradient for depth */}
       <div
-        className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          background: `radial-gradient(circle at center, var(--overlay-accent, var(--overlay-blue)), transparent 50%)`,
-          filter: `blur(calc(var(--overlay-blur-amount) * 1.25))`,
+          width: `${GRADIENT_SIZE_SMALL}px`,
+          height: `${GRADIENT_SIZE_SMALL}px`,
+          background: 'radial-gradient(circle at center, var(--overlay-accent, var(--overlay-blue)), transparent 50%)',
+          filter: 'blur(calc(var(--overlay-blur-amount) * 1.25))',
           opacity: isHovering 
-            ? `calc(var(--overlay-opacity-hover) * 0.5)` 
-            : `calc(var(--overlay-opacity-rest) * 0.5)`,
-          transform: `translate(-50%, -50%)`,
+            ? 'calc(var(--overlay-opacity-hover) * 0.5)' 
+            : 'calc(var(--overlay-opacity-rest) * 0.5)',
+          transform: 'translate(-50%, -50%)',
           left: `${mousePosition.x - 5}%`,
           top: `${mousePosition.y + 15}%`,
           transition: 'opacity var(--duration-deliberate) var(--ease-out-expo)',
           willChange: 'transform, opacity',
-          mixBlendMode: 'color-dodge',
+          mixBlendMode: 'var(--overlay-blend-mode-accent, color-dodge)',
         }}
       />
     </div>

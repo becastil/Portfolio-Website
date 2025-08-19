@@ -151,6 +151,11 @@ Anthropic-inspired design system with responsive scaling
   --overlay-opacity-rest: 0.15;
   --overlay-opacity-hover: 0.25;
   --overlay-blur-amount: 120px;
+  
+  /* Overlay blend modes for configurable visual effects */
+  --overlay-blend-mode-primary: screen;
+  --overlay-blend-mode-secondary: screen;
+  --overlay-blend-mode-accent: color-dodge;
 }
 
 /* Dark Theme Tokens */
@@ -190,6 +195,11 @@ Anthropic-inspired design system with responsive scaling
   /* Adjusted opacity for dark mode */
   --overlay-opacity-rest: 0.2;
   --overlay-opacity-hover: 0.35;
+  
+  /* Overlay blend modes adjusted for dark mode */
+  --overlay-blend-mode-primary: screen;
+  --overlay-blend-mode-secondary: screen;
+  --overlay-blend-mode-accent: color-dodge;
 }
 
 /* Responsive Token Adjustments */
