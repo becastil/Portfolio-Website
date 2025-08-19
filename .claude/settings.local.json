@@ -35,7 +35,8 @@
       "Bash(NODE_OPTIONS='--max-old-space-size=4096' npx next build)",
       "Bash(pkill:*)",
       "Bash(npx tsx:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "WebFetch(domain:playwright.dev)"
     ],
     "deny": [],
     "ask": []
