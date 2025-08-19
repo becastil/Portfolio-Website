@@ -156,6 +156,23 @@ Anthropic-inspired design system with responsive scaling
   --overlay-blend-mode-primary: screen;
   --overlay-blend-mode-secondary: screen;
   --overlay-blend-mode-accent: color-dodge;
+  
+  /* Advanced overlay animation settings */
+  --overlay-velocity-decay: 0.95;
+  --overlay-max-velocity: 100;
+  --overlay-lerp-factor: 0.08;
+  --overlay-fps-target: 60;
+  --overlay-parallax-depth-1: 1;
+  --overlay-parallax-depth-2: 0.7;
+  --overlay-parallax-depth-3: 0.5;
+  
+  /* Keyboard control settings */
+  --overlay-keyboard-step: 5;
+  --overlay-keyboard-step-large: 10;
+  
+  /* Touch gesture settings */
+  --overlay-touch-momentum: 0.1;
+  --overlay-touch-sensitivity: 1;
 }
 
 /* Dark Theme Tokens */
@@ -200,6 +217,23 @@ Anthropic-inspired design system with responsive scaling
   --overlay-blend-mode-primary: screen;
   --overlay-blend-mode-secondary: screen;
   --overlay-blend-mode-accent: color-dodge;
+  
+  /* Advanced overlay animation settings (same for dark mode) */
+  --overlay-velocity-decay: 0.95;
+  --overlay-max-velocity: 100;
+  --overlay-lerp-factor: 0.08;
+  --overlay-fps-target: 60;
+  --overlay-parallax-depth-1: 1;
+  --overlay-parallax-depth-2: 0.7;
+  --overlay-parallax-depth-3: 0.5;
+  
+  /* Keyboard control settings */
+  --overlay-keyboard-step: 5;
+  --overlay-keyboard-step-large: 10;
+  
+  /* Touch gesture settings */
+  --overlay-touch-momentum: 0.1;
+  --overlay-touch-sensitivity: 1;
 }
 
 /* Responsive Token Adjustments */
