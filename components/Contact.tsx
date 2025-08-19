@@ -140,7 +140,7 @@ export default function Contact() {
                 onChange={handleChange('name')}
                 className={cn(
                   'form-input',
-                  errors.name && 'border-error focus:ring-error/10'
+                  errors.name && 'border-error focus:ring-error focus:ring-opacity-10'
                 )}
                 aria-invalid={!!errors.name}
                 aria-describedby={errors.name ? 'name-error' : undefined}
@@ -165,7 +165,7 @@ export default function Contact() {
                 onChange={handleChange('email')}
                 className={cn(
                   'form-input',
-                  errors.email && 'border-error focus:ring-error/10'
+                  errors.email && 'border-error focus:ring-error focus:ring-opacity-10'
                 )}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? 'email-error' : undefined}
@@ -204,7 +204,7 @@ export default function Contact() {
                 onChange={handleChange('message')}
                 className={cn(
                   'form-input resize-y min-h-[120px]',
-                  errors.message && 'border-error focus:ring-error/10'
+                  errors.message && 'border-error focus:ring-error focus:ring-opacity-10'
                 )}
                 placeholder="Tell me about your project or just say hello!"
                 aria-invalid={!!errors.message}

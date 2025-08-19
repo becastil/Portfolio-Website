@@ -31,12 +31,12 @@
 /* Enhanced base layer */
 @layer base {
   html {
-    @apply scroll-smooth theme-transition;
+    scroll-behavior: smooth;
     overflow-x: hidden;
   }
 
   body {
-    @apply text-text-primary bg-background font-mono theme-transition;
+    @apply text-text-primary bg-background font-mono;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
@@ -45,7 +45,7 @@
 
   /* Enhanced typography with token integration */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-mono theme-transition;
+    @apply font-mono;
     font-variant-numeric: lining-nums;
   }
   
@@ -57,26 +57,34 @@
   h6 { @apply text-lg font-semibold leading-normal; }
 
   p {
-    @apply text-text-secondary leading-relaxed font-mono theme-transition;
+    @apply text-text-secondary leading-relaxed font-mono;
     max-width: 65ch;
     font-variant-numeric: lining-nums;
   }
   
   /* Enhanced interactive elements */
   a {
-    @apply font-mono theme-transition;
+    @apply font-mono;
+    transition: color var(--duration-normal) var(--ease-formless),
+                background-color var(--duration-normal) var(--ease-formless);
   }
   
   button {
-    @apply font-mono theme-transition;
+    @apply font-mono;
+    transition: color var(--duration-normal) var(--ease-formless),
+                background-color var(--duration-normal) var(--ease-formless),
+                border-color var(--duration-normal) var(--ease-formless);
   }
   
   input, textarea, select {
-    @apply font-mono theme-transition;
+    @apply font-mono;
+    transition: color var(--duration-normal) var(--ease-formless),
+                background-color var(--duration-normal) var(--ease-formless),
+                border-color var(--duration-normal) var(--ease-formless);
   }
   
   label {
-    @apply font-mono font-medium theme-transition;
+    @apply font-mono font-medium;
   }
 
   /* Enhanced focus states using tokens with proper contrast */
@@ -644,7 +652,7 @@
 
 /* Enhanced mobile menu accessibility */
 .mobile-menu-backdrop {
-  @apply fixed inset-0 bg-background/80 backdrop-blur-sm z-modal-backdrop;
+  @apply fixed inset-0 bg-background bg-opacity-80 backdrop-blur-sm z-modal-backdrop;
   /* Prevent interaction with background content */
   touch-action: none;
 }
