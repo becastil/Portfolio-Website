@@ -33,7 +33,9 @@
       "Bash(npx next build:*)",
       "Bash(npx tailwindcss:*)",
       "Bash(NODE_OPTIONS='--max-old-space-size=4096' npx next build)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(npx tsx:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,119 @@
+{
+  "timings": [
+    {
+      "metric": "first-contentful-paint",
+      "budget": 1500,
+      "warning": 1200
+    },
+    {
+      "metric": "largest-contentful-paint",
+      "budget": 2500,
+      "warning": 2000
+    },
+    {
+      "metric": "time-to-interactive",
+      "budget": 3000,
+      "warning": 2500
+    },
+    {
+      "metric": "cumulative-layout-shift",
+      "budget": 0.1,
+      "warning": 0.05
+    },
+    {
+      "metric": "first-input-delay",
+      "budget": 100,
+      "warning": 50
+    }
+  ],
+  "resourceSizes": [
+    {
+      "resourceType": "script",
+      "budget": 300,
+      "warning": 250
+    },
+    {
+      "resourceType": "stylesheet",
+      "budget": 50,
+      "warning": 40
+    },
+    {
+      "resourceType": "image",
+      "budget": 500,
+      "warning": 400
+    },
+    {
+      "resourceType": "font",
+      "budget": 100,
+      "warning": 80
+    },
+    {
+      "resourceType": "total",
+      "budget": 1000,
+      "warning": 850
+    }
+  ],
+  "resourceCounts": [
+    {
+      "resourceType": "script",
+      "budget": 10,
+      "warning": 8
+    },
+    {
+      "resourceType": "stylesheet",
+      "budget": 5,
+      "warning": 4
+    },
+    {
+      "resourceType": "font",
+      "budget": 5,
+      "warning": 4
+    },
+    {
+      "resourceType": "third-party",
+      "budget": 10,
+      "warning": 8
+    }
+  ],
+  "heroOverlaySpecific": {
+    "comment": "Specific budgets for HeroOverlay component",
+    "componentSize": {
+      "budget": 35,
+      "warning": 30,
+      "unit": "KB"
+    },
+    "withDependencies": {
+      "budget": 75,
+      "warning": 65,
+      "unit": "KB"
+    },
+    "animationLibraries": {
+      "budget": 50,
+      "warning": 45,
+      "unit": "KB"
+    },
+    "canvasUtilities": {
+      "budget": 30,
+      "warning": 25,
+      "unit": "KB"
+    },
+    "renderTime": {
+      "budget": 16,
+      "warning": 8,
+      "unit": "ms",
+      "description": "Time per frame for 60fps"
+    },
+    "memoryUsage": {
+      "budget": 10,
+      "warning": 8,
+      "unit": "MB",
+      "description": "Memory consumed by particle system"
+    },
+    "particleCount": {
+      "budget": 100,
+      "warning": 80,
+      "unit": "particles",
+      "description": "Maximum particle count for performance"
+    }
+  }
+}

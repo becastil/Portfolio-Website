@@ -2,7 +2,9 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
-import HeroOverlay from './HeroOverlay'
+import SafeHeroOverlay from './errors/SafeHeroOverlay'
+import { FallbackMode } from './errors/HeroOverlayErrorBoundary'
+import { PerformanceMode, AnimationIntensity } from './HeroOverlay'
 
 export default function Hero() {
   const shouldReduceMotion = useReducedMotion()
@@ -81,8 +83,35 @@ export default function Hero() {
       className="relative bg-[var(--bg)] text-[var(--text)] py-24 sm:py-32 overflow-hidden" 
       aria-labelledby="hero-heading"
     >
-      {/* Interactive color overlay - Formless-inspired */}
-      <HeroOverlay />
+      {/* Interactive color overlay with error boundaries and graceful fallbacks */}
+      <SafeHeroOverlay 
+        particleCount={50}
+        performanceMode={PerformanceMode.BALANCED}
+        intensity={AnimationIntensity.NORMAL}
+        preferredFallback={FallbackMode.GRADIENT}
+        safetyConfig={{
+          enableWebGLRecovery: true,
+          enablePerformanceMonitoring: true,
+          minBrowserVersions: {
+            chrome: 80,
+            firefox: 75,
+            safari: 13,
+            edge: 80
+          }
+        }}
+        features={{
+          particles: true,
+          connections: true,
+          mouseInteraction: true,
+          pulseEffect: true,
+          gradientBackground: false,
+          autoQuality: true
+        }}
+        accessibility={{
+          respectMotionPreference: true,
+          ariaLabel: 'Decorative particle animation background'
+        }}
+      />
       
       {/* Subtle background gradient for depth */}
       <div 

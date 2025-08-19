@@ -231,7 +231,7 @@ export function useAccessibility() {
  * Hook for managing ARIA live regions
  */
 export function useAriaLiveRegion() {
-  const liveRegionRef = useRef<HTMLDivElement>(null)
+  const liveRegionRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // Create a live region if it doesn't exist

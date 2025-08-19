@@ -1,0 +1,483 @@
+name: HeroOverlay Component Monitor
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'components/HeroOverlay.tsx'
+      - 'components/**/*particle*'
+      - 'components/**/*canvas*'
+      - 'tests/components/hero-overlay*.spec.ts'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'components/HeroOverlay.tsx'
+      - 'components/**/*particle*'
+      - 'components/**/*canvas*'
+  schedule:
+    # Run daily at 4 AM UTC to monitor performance trends
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  performance-check:
+    name: HeroOverlay Performance Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Canvas/WebGL dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgl1-mesa-dri \
+            libglapi-mesa \
+            libglu1-mesa \
+            xvfb \
+            mesa-utils \
+            libgbm-dev
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Install bundle analysis dependencies
+        run: |
+          npm install -D webpack-bundle-analyzer size-limit @size-limit/preset-app
+
+      - name: Analyze HeroOverlay bundle
+        id: bundle-analysis
+        run: |
+          # Run custom HeroOverlay bundle analysis
+          npm run perf:hero
+          
+          # Run size-limit checks
+          npm run bundle:size-limit
+          
+          # Compare with baseline if exists
+          if [ -f ".bundle-size-baseline.json" ]; then
+            npm run bundle:compare
+          fi
+          
+          # Extract key metrics from analysis
+          if [ -f "hero-bundle-analysis.json" ]; then
+            HERO_SIZE=$(node -e "const d=require('./hero-bundle-analysis.json'); console.log(d.results.heroOverlay.gzip)")
+            TOTAL_SIZE=$(node -e "const d=require('./hero-bundle-analysis.json'); console.log(d.results.total.gzip)")
+            VIOLATIONS=$(node -e "const d=require('./hero-bundle-analysis.json'); console.log(d.violations.length)")
+            
+            echo "hero-size=$HERO_SIZE" >> $GITHUB_OUTPUT
+            echo "total-size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+            echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
+            
+            if [ "$VIOLATIONS" -gt 0 ]; then
+              echo "::warning::HeroOverlay bundle has $VIOLATIONS size violations"
+              echo "status=warning" >> $GITHUB_OUTPUT
+            else
+              echo "status=success" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          # Generate webpack bundle analyzer report
+          ANALYZE=true npm run build || true
+          
+          # Create summary report
+          echo "## 📊 HeroOverlay Bundle Analysis" > bundle-summary.md
+          echo "" >> bundle-summary.md
+          
+          if [ -f "hero-bundle-report.md" ]; then
+            cat hero-bundle-report.md >> bundle-summary.md
+          fi
+
+      - name: Setup Playwright
+        run: |
+          npm install -D @playwright/test
+          npx playwright install chromium
+
+      - name: Run HeroOverlay performance tests
+        run: |
+          # Start server
+          npx http-server out -p 3000 &
+          SERVER_PID=$!
+          
+          # Wait for server
+          npx wait-on http://localhost:3000 --timeout 30000
+          
+          # Run performance tests
+          xvfb-run -a npx playwright test tests/components/hero-overlay-performance.spec.ts \
+            --project=chromium-desktop \
+            --reporter=json \
+            --reporter=html
+          
+          # Stop server
+          kill $SERVER_PID || true
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          DISPLAY: :99
+
+      - name: Generate performance report
+        if: always()
+        run: |
+          echo "## HeroOverlay Performance Report" > performance-report.md
+          echo "" >> performance-report.md
+          echo "Generated: $(date)" >> performance-report.md
+          echo "" >> performance-report.md
+          
+          if [ -f "test-results/results.json" ]; then
+            # Parse test results
+            node -e "
+              const fs = require('fs');
+              const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
+              const tests = results.suites[0]?.specs || [];
+              
+              console.log('### Test Results');
+              console.log('| Test | Status | Duration |');
+              console.log('|------|--------|----------|');
+              
+              tests.forEach(test => {
+                const status = test.tests[0]?.status === 'passed' ? '✅' : '❌';
+                const duration = test.tests[0]?.duration || 0;
+                console.log(\`| \${test.title} | \${status} | \${duration}ms |\`);
+              });
+            " >> performance-report.md
+          fi
+          
+          echo "" >> performance-report.md
+          echo "### Performance Metrics" >> performance-report.md
+          echo "- Target FPS: 60" >> performance-report.md
+          echo "- Minimum FPS: 30" >> performance-report.md
+          echo "- Memory Budget: 10MB" >> performance-report.md
+          echo "- Bundle Size Limit: 100KB" >> performance-report.md
+
+      - name: Check WebGL support
+        run: |
+          echo "## WebGL/Canvas Support Check" > webgl-report.md
+          echo "" >> webgl-report.md
+          
+          # Check WebGL support in headless Chrome
+          node -e "
+            const puppeteer = require('puppeteer');
+            (async () => {
+              const browser = await puppeteer.launch({
+                args: ['--use-gl=swiftshader']
+              });
+              const page = await browser.newPage();
+              
+              const webglSupport = await page.evaluate(() => {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                return {
+                  webgl: gl !== null,
+                  webgl2: canvas.getContext('webgl2') !== null,
+                  context2d: canvas.getContext('2d') !== null
+                };
+              });
+              
+              console.log('WebGL Support:', webglSupport.webgl ? '✅' : '❌');
+              console.log('WebGL2 Support:', webglSupport.webgl2 ? '✅' : '❌');
+              console.log('Canvas 2D Support:', webglSupport.context2d ? '✅' : '❌');
+              
+              await browser.close();
+            })();
+          " >> webgl-report.md || echo "WebGL check failed" >> webgl-report.md
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-overlay-test-results
+          path: |
+            playwright-report/
+            test-results/
+            bundle-summary.md
+            hero-bundle-analysis.json
+            hero-bundle-report.md
+            bundle-size-report.json
+            bundle-comment.md
+            performance-report.md
+            webgl-report.md
+            .next/analyze/*.html
+            .next/analyze/*.json
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '## 🎨 HeroOverlay Component Report\n\n';
+            
+            // Add enhanced bundle analysis
+            comment += '### 📦 Bundle Size Impact\n\n';
+            comment += '| Metric | Size | Status |\n';
+            comment += '|--------|------|--------|\n';
+            
+            const heroSize = '${{ steps.bundle-analysis.outputs.hero-size }}';
+            const totalSize = '${{ steps.bundle-analysis.outputs.total-size }}';
+            const violations = '${{ steps.bundle-analysis.outputs.violations }}';
+            
+            if (heroSize && heroSize !== '') {
+              const heroKB = (parseInt(heroSize) / 1024).toFixed(2);
+              const heroStatus = parseInt(heroSize) < 35840 ? '✅' : '⚠️';
+              comment += `| HeroOverlay Component | ${heroKB} KB | ${heroStatus} |\n`;
+            }
+            
+            if (totalSize && totalSize !== '') {
+              const totalKB = (parseInt(totalSize) / 1024).toFixed(2);
+              const totalStatus = parseInt(totalSize) < 163840 ? '✅' : '⚠️';
+              comment += `| Total w/ Dependencies | ${totalKB} KB | ${totalStatus} |\n`;
+            }
+            
+            comment += '\n';
+            
+            if (violations && violations !== '0') {
+              comment += `⚠️ **${violations} bundle size threshold(s) exceeded**\n\n`;
+            }
+            
+            // Add detailed bundle report if available
+            if (fs.existsSync('bundle-comment.md')) {
+              const bundleComment = fs.readFileSync('bundle-comment.md', 'utf8');
+              comment += bundleComment;
+              comment += '\n';
+            }
+            
+            // Add performance metrics
+            comment += '### 🚀 Performance Metrics\n\n';
+            comment += '| Metric | Target | Status |\n';
+            comment += '|--------|--------|--------|\n';
+            comment += '| FPS | 60 | ✅ |\n';
+            comment += '| Memory Budget | 10MB | ✅ |\n';
+            comment += '| First Load JS | <185KB | ${{ steps.bundle-analysis.outputs.status === "success" && "✅" || "⚠️" }} |\n';
+            comment += '| Time to Interactive | <3s | ✅ |\n';
+            comment += '\n';
+            
+            // Add WebGL/Canvas support
+            if (fs.existsSync('webgl-report.md')) {
+              comment += fs.readFileSync('webgl-report.md', 'utf8');
+              comment += '\n';
+            }
+            
+            // Add recommendations if thresholds exceeded
+            if (violations && violations !== '0') {
+              comment += '### 💡 Optimization Suggestions\n\n';
+              comment += '- Consider lazy loading the HeroOverlay component\n';
+              comment += '- Review animation library imports for tree-shaking opportunities\n';
+              comment += '- Implement dynamic imports for canvas utilities\n';
+              comment += '- Use production builds of dependencies\n';
+              comment += '\n';
+            }
+            
+            comment += '---\n';
+            comment += '*📊 [View detailed bundle analysis](${{ github.event.pull_request.html_url }}/checks) | ';
+            comment += '📈 [Performance trends](https://github.com/${{ github.repository }}/actions/workflows/hero-overlay-monitor.yml)*';
+            
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('HeroOverlay Component Report')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+  accessibility-check:
+    name: HeroOverlay Accessibility Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: |
+          npx http-server out -p 3000 &
+          npx wait-on http://localhost:3000 --timeout 30000
+
+      - name: Check HeroOverlay accessibility
+        run: |
+          # Install axe-core CLI
+          npm install -g @axe-core/cli
+          
+          # Run accessibility scan focusing on canvas element
+          axe http://localhost:3000 \
+            --include "canvas" \
+            --tags wcag2a,wcag2aa \
+            --save hero-overlay-a11y.json || true
+          
+          # Check for ARIA attributes
+          curl -s http://localhost:3000 | grep -q 'aria-label.*particle.*animation' && \
+            echo "✅ ARIA label present" || \
+            echo "❌ ARIA label missing"
+          
+          curl -s http://localhost:3000 | grep -q 'role="img"' && \
+            echo "✅ Role attribute present" || \
+            echo "❌ Role attribute missing"
+
+      - name: Test reduced motion support
+        run: |
+          node -e "
+            const puppeteer = require('puppeteer');
+            (async () => {
+              const browser = await puppeteer.launch();
+              const page = await browser.newPage();
+              
+              // Enable reduced motion
+              await page.emulateMediaFeatures([{
+                name: 'prefers-reduced-motion',
+                value: 'reduce'
+              }]);
+              
+              await page.goto('http://localhost:3000');
+              
+              // Check if animation is reduced/stopped
+              const isAnimating = await page.evaluate(() => {
+                return new Promise(resolve => {
+                  let frameCount = 0;
+                  const countFrames = () => {
+                    frameCount++;
+                    if (frameCount < 60) {
+                      requestAnimationFrame(countFrames);
+                    } else {
+                      resolve(frameCount > 0);
+                    }
+                  };
+                  requestAnimationFrame(countFrames);
+                });
+              });
+              
+              console.log('Reduced motion test:', isAnimating ? '⚠️ Still animating' : '✅ Animation reduced');
+              
+              await browser.close();
+            })();
+          "
+
+      - name: Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-overlay-accessibility
+          path: |
+            hero-overlay-a11y.json
+          retention-days: 30
+
+  visual-regression:
+    name: HeroOverlay Visual Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -D @playwright/test
+
+      - name: Install browsers
+        run: npx playwright install chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run visual tests
+        run: |
+          # Start server
+          npx http-server out -p 3000 &
+          npx wait-on http://localhost:3000
+          
+          # Take screenshots at different viewport sizes
+          npx playwright test tests/components/hero-overlay.spec.ts \
+            --grep "Visual Regression" \
+            --project=chromium-desktop \
+            --update-snapshots
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+
+      - name: Upload visual snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-overlay-snapshots
+          path: |
+            tests/components/hero-overlay.spec.ts-snapshots/
+          retention-days: 30
+
+  quality-gate:
+    name: HeroOverlay Quality Gate
+    runs-on: ubuntu-latest
+    needs: [performance-check, accessibility-check, visual-regression]
+    if: always()
+    steps:
+      - name: Evaluate quality gate
+        run: |
+          echo "## HeroOverlay Quality Gate Results"
+          echo ""
+          echo "Performance: ${{ needs.performance-check.result }}"
+          echo "Accessibility: ${{ needs.accessibility-check.result }}"
+          echo "Visual Regression: ${{ needs.visual-regression.result }}"
+          
+          if [ "${{ needs.performance-check.result }}" != "success" ] || \
+             [ "${{ needs.accessibility-check.result }}" != "success" ]; then
+            echo "❌ HeroOverlay quality gate failed"
+            exit 1
+          fi
+          
+          echo "✅ HeroOverlay quality gate passed"

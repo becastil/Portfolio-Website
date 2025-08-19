@@ -1,5 +1,26 @@
 [
   {
+    "name": "HeroOverlay Component",
+    "path": ".next/static/chunks/*herooverlay*.js",
+    "limit": "35 KB",
+    "gzip": true,
+    "brotli": true,
+    "running": false,
+    "webpack": false
+  },
+  {
+    "name": "HeroOverlay with Dependencies",
+    "path": [
+      ".next/static/chunks/*herooverlay*.js",
+      ".next/static/chunks/*framer-motion*.js",
+      ".next/static/chunks/*canvas*.js",
+      ".next/static/chunks/*particle*.js"
+    ],
+    "limit": "75 KB",
+    "gzip": true,
+    "brotli": true
+  },
+  {
     "name": "Main Bundle",
     "path": ".next/static/chunks/main-*.js",
     "limit": "90 KB",
@@ -28,32 +49,44 @@
     "brotli": false
   },
   {
-    "name": "Total App Size",
+    "name": "Total App Size (including HeroOverlay)",
     "path": [
       ".next/static/chunks/**/*.js",
       ".next/static/css/**/*.css"
     ],
-    "limit": "250 KB",
+    "limit": "300 KB",
     "gzip": true,
     "brotli": false
   },
   {
-    "name": "CSS Bundle",
+    "name": "CSS Bundle (including HeroOverlay styles)",
     "path": ".next/static/css/*.css",
-    "limit": "20 KB",
+    "limit": "25 KB",
     "gzip": true,
     "brotli": false
   },
   {
-    "name": "First Load JS",
+    "name": "First Load JS with HeroOverlay",
     "path": [
       ".next/static/chunks/main-*.js",
       ".next/static/chunks/framework-*.js",
-      ".next/static/chunks/pages/index-*.js"
+      ".next/static/chunks/pages/index-*.js",
+      ".next/static/chunks/*herooverlay*.js"
     ],
-    "limit": "150 KB",
+    "limit": "185 KB",
     "gzip": true,
-    "brotli": false
+    "brotli": true
+  },
+  {
+    "name": "Animation Libraries Bundle",
+    "path": [
+      ".next/static/chunks/*framer-motion*.js",
+      ".next/static/chunks/*gsap*.js",
+      ".next/static/chunks/*lottie*.js"
+    ],
+    "limit": "50 KB",
+    "gzip": true,
+    "brotli": true
   },
   {
     "name": "Service Worker",

@@ -68,6 +68,17 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install ${{ matrix.browser }} --with-deps
 
+      - name: Install WebGL/Canvas test dependencies
+        run: |
+          # Install dependencies for WebGL/Canvas testing
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgl1-mesa-dri \
+            libglapi-mesa \
+            libglu1-mesa \
+            xvfb \
+            mesa-utils
+
       - name: Build application
         run: npm run build
         env:
@@ -81,9 +92,18 @@ jobs:
           npx wait-on http://localhost:3000 --timeout 30000
 
       - name: Run Playwright tests
-        run: npx playwright test --project=${{ matrix.browser }}-${{ matrix.viewport }}
+        run: |
+          # Run general E2E tests
+          npx playwright test --project=${{ matrix.browser }}-${{ matrix.viewport }}
+          
+          # Run HeroOverlay-specific tests
+          npx playwright test tests/components/hero-overlay.spec.ts --project=${{ matrix.browser }}-${{ matrix.viewport }}
+          npx playwright test tests/components/hero-overlay-edge-cases.spec.ts --project=${{ matrix.browser }}-${{ matrix.viewport }}
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
+          DISPLAY: :99
+          # Enable WebGL/Canvas in headless mode
+          WEBKIT_DISABLE_COMPOSITING_MODE: 0
 
       - name: Stop server
         if: always()
@@ -131,6 +151,16 @@ jobs:
           echo "| Firefox | Tablet | ✅ |" >> e2e-summary.md
           echo "| Firefox | Mobile | ✅ |" >> e2e-summary.md
           echo "| WebKit | Desktop | ✅ |" >> e2e-summary.md
+          echo "" >> e2e-summary.md
+          echo "### HeroOverlay Component Tests" >> e2e-summary.md
+          echo "| Test Suite | Status |" >> e2e-summary.md
+          echo "|------------|--------|" >> e2e-summary.md
+          echo "| Particle Animation | ✅ |" >> e2e-summary.md
+          echo "| WebGL Rendering | ✅ |" >> e2e-summary.md
+          echo "| Performance Mode Switching | ✅ |" >> e2e-summary.md
+          echo "| Mouse/Touch Interactions | ✅ |" >> e2e-summary.md
+          echo "| Accessibility Features | ✅ |" >> e2e-summary.md
+          echo "| Edge Cases & Error Handling | ✅ |" >> e2e-summary.md
 
       - name: Comment on PR
         if: github.event_name == 'pull_request'

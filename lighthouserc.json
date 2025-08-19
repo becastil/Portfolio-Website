@@ -52,7 +52,12 @@
         
         "no-unload-listeners": "error",
         "no-document-write": "error",
-        "js-libraries": "warn"
+        "js-libraries": "warn",
+        
+        "mainthread-work-breakdown": ["warn", {"maxNumericValue": 2000}],
+        "bootup-time": ["warn", {"maxNumericValue": 3000}],
+        "unused-javascript": ["warn", {"maxWastedBytes": 50000}],
+        "dom-size": ["warn", {"maxNumericValue": 1500}]
       }
     },
     "upload": {
