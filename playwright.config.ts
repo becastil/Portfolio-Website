@@ -21,7 +21,6 @@ export default defineConfig({
     toMatchSnapshot: { 
       threshold: 0.2,
       maxDiffPixels: 100,
-      animations: 'disabled',
     },
     // Timeout for assertions
     timeout: 10000,
