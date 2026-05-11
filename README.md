@@ -92,11 +92,10 @@ npm run deploy
 
 ### GitHub Pages
 
-The site is configured for GitHub Pages deployment with a custom domain.
+The site is configured for static export and can be deployed to GitHub Pages.
 
 1. Push to the `main` branch
-2. GitHub Actions will automatically build and deploy
-3. Site will be available at `https://bencastillo.dev`
+2. GitHub Actions will build and export the static site to the `gh-pages` branch
 
 ### Manual Deployment
 
