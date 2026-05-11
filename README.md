@@ -129,4 +129,4 @@ MIT License - feel free to use this code for your own portfolio!
 
 ## Contact
 
-Ben Castillo - ben@bencastillo.dev
+Ben Castillo - bencastillo14@yahoo.com
